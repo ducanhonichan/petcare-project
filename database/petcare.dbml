@@ -1,0 +1,92 @@
+Table users {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  email varchar(255) [not null, unique]
+  password_hash varchar(255) [not null]
+  role varchar(20) [not null, default: 'USER']
+  is_banned boolean [not null, default: false]
+  remind_before_days int [not null, default: 7]
+  created_at datetime [default: `now()`]
+}
+
+Table species {
+  id int [pk, increment]
+  name varchar(50) [not null, unique]
+}
+
+Table pets {
+  id int [pk, increment]
+  user_id int [not null]
+  name varchar(100) [not null]
+  species_id int [not null]
+  breed varchar(100)
+  gender varchar(10)
+  birth_date date
+  color varchar(50)
+  avatar_url varchar(255)
+  note text
+  is_active boolean [not null, default: true]
+  created_at datetime [default: `now()`]
+}
+
+Ref: pets.user_id > users.id
+Ref: pets.species_id > species.id
+
+
+
+Table weight_logs {
+  id int [pk, increment]
+  pet_id int [not null]
+  weight_kg decimal(5,2) [not null]
+  measured_at date [not null]
+  note text
+
+  indexes {
+    (pet_id, measured_at) [unique]
+  }
+}
+
+Ref: weight_logs.pet_id > pets.id
+
+
+
+Table vaccine_types {
+  id int [pk, increment]
+  name varchar(100) [not null]
+  species_id int
+  interval_days int
+  description text
+  is_active boolean [not null, default: true]
+}
+
+Ref: vaccine_types.species_id >? species.id
+
+
+Table vaccinations {
+  id int [pk, increment]
+  pet_id int [not null]
+  vaccine_type_id int [not null]
+  given_date date [not null]
+  next_due_date date
+  clinic varchar(150)
+  note text
+}
+
+Ref: vaccinations.pet_id > pets.id
+Ref: vaccinations.vaccine_type_id > vaccine_types.id
+
+
+
+
+Table vet_visits {
+  id int [pk, increment]
+  pet_id int [not null]
+  visit_date date [not null]
+  clinic varchar(150)
+  reason text
+  diagnosis text
+  cost decimal(12,2)
+  note text
+}
+
+Ref: vet_visits.pet_id > pets.id
