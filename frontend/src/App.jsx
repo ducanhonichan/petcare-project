@@ -1,26 +1,18 @@
-
-import './App.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import MainLayout from './components/MainLayout'
+import Home from './pages/Home'
+import Pets from './pages/Pets'
 
 function App() {
   return (
-    <div>
-      <h1>🐾 PetCare</h1>
-      <h2>Pet Health Management System</h2>
-
-      <p>
-        Welcome to PetCare! Manage your pets'
-        health information in one place.
-      </p>
-
-      <h3>Our Features</h3>
-      <ul>
-        <li>Pet Profile Management</li>
-        <li>Weight Tracking</li>
-        <li>Vaccination Records</li>
-        <li>Vaccination Reminders</li>
-        <li>Veterinary Visit History</li>
-      </ul>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/pets" element={<Pets />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
