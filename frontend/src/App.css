@@ -1,0 +1,161 @@
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  background: #f5f8fc;
+}
+
+#root > div {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 48px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+h1 {
+  color: #2c7a7b;
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+h2 {
+  color: #243447;
+  font-size: 26px;
+}
+
+h3 {
+  margin-top: 40px;
+  color: #2c7a7b;
+}
+
+p {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  padding: 22px;
+  background: #eaf7f4;
+  border-radius: 12px;
+  color: #285e61;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  #root > div {
+    margin: 20px 12px;
+    padding: 24px;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+
+  ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ===== PETCARE NAVBAR ===== */
+
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+.navbar-brand {
+  font-size: 24px;
+  font-weight: bold;
+  color: #008b83;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #344054;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.navbar-links a:hover {
+  color: #008b83;
+}
+
+/* Responsive Navbar */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .navbar-brand {
+    font-size: 20px;
+  }
+
+  .navbar-links {
+    gap: 15px;
+  }
+
+  .navbar-links a {
+    font-size: 14px;
+  }
+}
+
+
+/* ===== ACTIVE NAVIGATION ===== */
+
+.navbar-links a.active {
+  color: #008b83;
+  font-weight: 700;
+  border-bottom: 2px solid #008b83;
+  padding-bottom: 5px;
+}
+
+
+/* ===== MAIN LAYOUT ===== */
+
+.main-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  width: 100%;
+  flex: 1;
+  padding: 32px 20px;
+  box-sizing: border-box;
+}
+
+/* Responsive Layout */
+@media (max-width: 600px) {
+  .main-content {
+    padding: 20px 12px;
+  }
+}
