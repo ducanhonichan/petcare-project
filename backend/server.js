@@ -3,9 +3,19 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./src/config/db');
 
+const petsRouter = require('./src/routes/pets.routes');
+
+const speciesRouter = require('./src/routes/species.routes');
+
+
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/pets', petsRouter);
+
+
+app.use('/api/species', speciesRouter);
 
 app.get('/', (req, res) => res.json({ message: 'API is running' }));
 
