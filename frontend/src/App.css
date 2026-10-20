@@ -159,3 +159,330 @@ li {
     padding: 20px 12px;
   }
 }
+
+
+/* ===== MY PETS PAGE ===== */
+
+.pets-page {
+  width: 100%;
+}
+
+.pets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.pets-header h1 {
+  margin: 0 0 8px;
+  color: #2c7a7b;
+  font-size: 42px;
+}
+
+.pets-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.add-pet-btn {
+  padding: 14px 24px;
+  background: #008b83;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.add-pet-btn:hover {
+  background: #006e68;
+  transform: translateY(-2px);
+}
+
+/* Pet Cards */
+
+.pets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.pet-card {
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  transition: 0.2s ease;
+}
+
+.pet-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.pet-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 86px;
+  height: 86px;
+  background: #eaf7f4;
+  border-radius: 50%;
+  font-size: 46px;
+  margin-bottom: 20px;
+}
+
+.pet-card h2 {
+  margin: 0 0 6px;
+  color: #243447;
+  font-size: 26px;
+}
+
+.pet-card > p {
+  margin: 0 0 22px;
+  color: #64748b;
+}
+
+.pet-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.pet-details span {
+  padding: 8px 12px;
+  background: #eaf7f4;
+  color: #285e61;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Action Buttons */
+
+.pet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pet-actions button {
+  flex: 1;
+  min-width: 70px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1e5e1;
+  background: #ffffff;
+  color: #008b83;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pet-actions button:hover {
+  background: #eaf7f4;
+}
+
+.pet-actions button:last-child {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.pet-actions button:last-child:hover {
+  background: #fef2f2;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .pets-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pets-header h1 {
+    font-size: 34px;
+  }
+
+  .pets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-pet-btn {
+    width: 100%;
+  }
+
+  .pet-card {
+    padding: 24px;
+  }
+}
+
+
+
+
+/* ===== ADD NEW PET FORM ===== */
+
+.add-pet-form {
+  max-width: 700px;
+  margin: 0 auto 36px;
+  padding: 30px;
+  background: #ffffff;
+  border: 1px solid #dceae7;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.add-pet-form h2 {
+  margin: 0 0 24px;
+  color: #2c7a7b;
+  font-size: 26px;
+}
+
+.add-pet-form form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.add-pet-form form > div:not(.pet-form-actions) {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-pet-form label {
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.add-pet-form input,
+.add-pet-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: white;
+  color: #243447;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.add-pet-form input:focus,
+.add-pet-form select:focus {
+  outline: 2px solid #008b83;
+  outline-offset: 1px;
+}
+
+.pet-form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.pet-form-actions button {
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: 1px solid #d1e5e1;
+  background: white;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pet-form-actions button:last-child {
+  background: #008b83;
+  border-color: #008b83;
+  color: white;
+}
+
+.pet-form-actions button:last-child:hover {
+  background: #006e68;
+}
+
+@media (max-width: 600px) {
+  .add-pet-form {
+    padding: 20px;
+  }
+
+  .add-pet-form form {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-form-actions {
+    flex-direction: column;
+  }
+}
+
+
+
+
+
+
+/* ===== PET DETAILS ===== */
+
+.pets-page .add-pet-form:has(h2:first-child + .pet-detail-content) {
+  max-width: 650px;
+}
+
+.pet-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pet-detail-avatar {
+  font-size: 60px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.pet-detail-name {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #243b53;
+}
+
+.pet-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f5f8fc;
+  gap: 16px;
+}
+
+.pet-detail-label {
+  font-weight: 600;
+  color: #62758a;
+}
+
+.pet-detail-value {
+  font-weight: 600;
+  color: #243b53;
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  .pet-detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .pet-detail-value {
+    text-align: left;
+  }
+}
