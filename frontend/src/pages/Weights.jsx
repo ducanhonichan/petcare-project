@@ -1,5 +1,7 @@
+
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import WeightChart from '../components/WeightChart'
 
 function Weights() {
   const { petId } = useParams()
@@ -34,11 +36,16 @@ function Weights() {
       <h1>Weight Tracking</h1>
       <p>Track your pet's weight over time.</p>
 
+      {/* PET INFORMATION */}
       <section className="weights-card">
         <h2>Pet #{petId}</h2>
         <p>Weight history will appear here.</p>
       </section>
 
+      {/* WEIGHT HISTORY CHART */}
+      <WeightChart />
+
+      {/* ADD WEIGHT RECORD FORM */}
       <section className="weights-card">
         <h2>Add Weight Record</h2>
 
