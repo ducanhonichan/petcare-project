@@ -674,3 +674,29 @@ li {
   }
 }
 
+
+
+
+/* ===== MOBILE NAVBAR IMPROVEMENT ===== */
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 14px 12px;
+    gap: 10px;
+  }
+
+  .navbar-brand {
+    font-size: 17px;
+    white-space: nowrap;
+  }
+
+  .navbar-links {
+    gap: 12px;
+  }
+
+  .navbar-links a {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
