@@ -486,3 +486,151 @@ li {
     text-align: left;
   }
 }
+
+
+
+/* ===== WEIGHT TRACKING PAGE ===== */
+
+.weights-page {
+  width: 100%;
+}
+
+.weights-page > a {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #008b83;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.weights-page > a:hover {
+  text-decoration: underline;
+}
+
+.weights-page h1 {
+  margin: 0 0 8px;
+  font-size: 42px;
+  color: #2c7a7b;
+}
+
+.weights-page > p {
+  margin: 0 0 32px;
+  color: #64748b;
+}
+
+/* Weight Cards */
+
+.weights-card {
+  padding: 30px;
+  margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.weights-card h2 {
+  margin: 0 0 22px;
+  color: #243447;
+  font-size: 24px;
+}
+
+/* Weight Form */
+
+.weights-card form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.weights-card form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weights-card form > div:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.weights-card label {
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.weights-card input,
+.weights-card textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #243447;
+  font-size: 15px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.weights-card input:focus,
+.weights-card textarea:focus {
+  outline: 2px solid #008b83;
+  outline-offset: 1px;
+}
+
+.weights-card textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.weights-card button {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 13px 24px;
+  background: #008b83;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.weights-card button:hover {
+  background: #006e68;
+  transform: translateY(-2px);
+}
+
+.weights-card p[role="status"] {
+  margin: 20px 0 0;
+  padding: 14px 16px;
+  background: #eaf7f4;
+  border-radius: 10px;
+  color: #285e61;
+  font-weight: 600;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .weights-page h1 {
+    font-size: 34px;
+  }
+
+  .weights-card {
+    padding: 22px;
+  }
+
+  .weights-card form {
+    grid-template-columns: 1fr;
+  }
+
+  .weights-card form > div:nth-child(3) {
+    grid-column: auto;
+  }
+
+  .weights-card button {
+    width: 100%;
+  }
+}
