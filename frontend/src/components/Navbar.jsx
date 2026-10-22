@@ -1,3 +1,4 @@
+
 import { NavLink } from 'react-router-dom'
 
 function Navbar() {
@@ -14,6 +15,13 @@ function Navbar() {
           className={({ isActive }) => isActive ? 'active' : ''}
         >
           Home
+        </NavLink>
+
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) => isActive ? 'active' : ''}
+        >
+          Dashboard
         </NavLink>
 
         <NavLink
