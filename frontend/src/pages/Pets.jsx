@@ -1,6 +1,8 @@
 
 import { useState } from 'react'
 
+import { useNavigate } from 'react-router-dom'
+
 const emptyPet = {
   name: '',
   species: '',
@@ -9,6 +11,8 @@ const emptyPet = {
 }
 
 function Pets() {
+  const navigate = useNavigate()
+
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingPetId, setEditingPetId] = useState(null)
   const [selectedPetId, setSelectedPetId] = useState(null)
@@ -354,10 +358,18 @@ function Pets() {
                 Edit
               </button>
 
+<button
+  type="button"
+  onClick={() => navigate(`/pets/${pet.id}/weights`)}
+>
+  Weight Tracking
+</button>
               <button
                 type="button"
                 onClick={() => handleDeletePet(pet.id)}
               >
+
+          
                 Delete
               </button>
             </div>
