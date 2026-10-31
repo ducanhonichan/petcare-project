@@ -700,3 +700,288 @@ li {
   }
 }
 
+
+
+
+
+
+/* ===== VETERINARY VISITS (T24) ===== */
+
+.vet-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 32px;
+  color: #243447;
+}
+
+.vet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.vet-header h1 {
+  margin: 16px 0 8px;
+  font-size: 36px;
+  color: #243447;
+}
+
+.vet-header p {
+  margin: 0;
+  color: #718096;
+  font-size: 15px;
+}
+
+.vet-back-btn {
+  border: none;
+  background: transparent;
+  color: #238b78;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.vet-add-btn {
+  border: none;
+  border-radius: 10px;
+  background: #238b78;
+  color: white;
+  padding: 13px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.vet-add-btn:hover {
+  background: #176b5d;
+}
+
+.vet-form-card,
+.vet-list-section {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.vet-form-card h2,
+.vet-list-section h2 {
+  margin: 0 0 24px;
+  font-size: 22px;
+  color: #243447;
+}
+
+.vet-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.vet-form-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vet-form-grid label {
+  color: #425466;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.vet-form-grid input,
+.vet-form-grid textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #dce4ea;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 14px;
+  color: #243447;
+  outline: none;
+  background: #fff;
+}
+
+.vet-form-grid input:focus,
+.vet-form-grid textarea:focus {
+  border-color: #238b78;
+  box-shadow: 0 0 0 3px rgba(35, 139, 120, 0.1);
+}
+
+.vet-form-grid textarea {
+  resize: vertical;
+}
+
+.vet-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.vet-form-actions button {
+  padding: 11px 20px;
+  border: none;
+  border-radius: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vet-form-actions button:first-child {
+  background: #edf2f7;
+  color: #425466;
+}
+
+.vet-form-actions button:last-child {
+  background: #238b78;
+  color: white;
+}
+
+.vet-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.vet-error {
+  background: #fff0f0;
+  border: 1px solid #ffcaca;
+  color: #c53030;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.vet-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: #718096;
+}
+
+.vet-empty-icon {
+  font-size: 42px;
+  margin-bottom: 14px;
+}
+
+.vet-empty h3 {
+  color: #243447;
+  margin-bottom: 8px;
+}
+
+.vet-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.vet-visit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vet-visit-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px;
+  transition: box-shadow 0.2s;
+}
+
+.vet-visit-card:hover {
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.05);
+}
+
+.vet-visit-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.vet-visit-date {
+  color: #238b78;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.vet-visit-top h3 {
+  margin: 7px 0 0;
+  font-size: 18px;
+  color: #243447;
+}
+
+.vet-delete-btn {
+  border: 1px solid #fed7d7;
+  background: #fff5f5;
+  color: #c53030;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vet-delete-btn:hover {
+  background: #fed7d7;
+}
+
+.vet-visit-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+}
+
+.vet-visit-details p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.vet-visit-details strong {
+  color: #334155;
+}
+
+/* Responsive Veterinary Visits */
+
+@media (max-width: 600px) {
+  .vet-page {
+    padding: 24px 16px;
+  }
+
+  .vet-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vet-header h1 {
+    font-size: 30px;
+  }
+
+  .vet-add-btn {
+    width: 100%;
+  }
+
+  .vet-form-card,
+  .vet-list-section {
+    padding: 20px;
+  }
+
+  .vet-form-grid,
+  .vet-visit-details {
+    grid-template-columns: 1fr;
+  }
+
+  .vet-visit-top {
+    flex-direction: column;
+  }
+
+  .vet-delete-btn {
+    align-self: flex-start;
+  }
+}

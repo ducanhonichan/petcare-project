@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const pool = require('./src/config/db');
+const vetVisitsRoutes = require('./src/routes/vetVisits.routes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/api/pets', vetVisitsRoutes);
 
 app.get('/', (req, res) => res.json({ message: 'API is running' }));
 
