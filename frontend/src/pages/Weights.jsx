@@ -26,7 +26,9 @@ function Weights() {
       return
     }
 
-    setMessage('Form validated. Saving will be available after login integration.')
+    setMessage(
+      'Form validated. Saving will be available after login integration.'
+    )
   }
 
   return (
@@ -34,7 +36,7 @@ function Weights() {
       <Link to="/pets">← Back to My Pets</Link>
 
       <h1>Weight Tracking</h1>
-      <p>Track your pet's weight over time.</p>
+      <p>Monitor your pet's weight and track progress over time.</p>
 
       {/* PET INFORMATION */}
       <section className="weights-card">
@@ -55,9 +57,10 @@ function Weights() {
             <input
               id="weight"
               type="number"
+              step="0.01"
               min="0.01"
               max="9999.99"
-              step="0.01"
+              placeholder="Enter weight"
               value={weight}
               onChange={(event) => setWeight(event.target.value)}
               required
@@ -65,11 +68,12 @@ function Weights() {
           </div>
 
           <div>
-            <label htmlFor="measuredAt">Measured At</label>
+            <label htmlFor="measuredAt">
+              Measurement Date &amp; Time
+            </label>
             <input
               id="measuredAt"
               type="datetime-local"
-              step="1"
               value={measuredAt}
               onChange={(event) => setMeasuredAt(event.target.value)}
               required
@@ -80,18 +84,18 @@ function Weights() {
             <label htmlFor="note">Note (optional)</label>
             <textarea
               id="note"
-              maxLength={5000}
+              placeholder="Add any notes about your pet's weight..."
               value={note}
               onChange={(event) => setNote(event.target.value)}
-              placeholder="Add a note about your pet's weight..."
-              rows={3}
             />
           </div>
 
-          <button type="submit">Validate Weight Record</button>
+          <button type="submit">Save Weight</button>
         </form>
 
-        {message && <p role="status">{message}</p>}
+        {message && (
+          <p role="status">{message}</p>
+        )}
       </section>
     </main>
   )
