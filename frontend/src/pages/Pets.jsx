@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-
+import StateDisplay from '../components/StateDisplay'
 const emptyPet = {
   name: '',
   species: '',
@@ -322,48 +322,59 @@ function Pets() {
         </div>
       )}
 
+      
       {/* PET LIST */}
-      <div className="pets-grid">
-        {pets.map((pet) => (
-          <div className="pet-card" key={pet.id}>
-            <div className="pet-avatar">
-              {pet.emoji}
+      {pets.length === 0 ? (
+        <StateDisplay
+          type="empty"
+          title="No pets yet"
+          message="You haven't added any pets. Start by creating your first pet profile."
+          actionLabel="Add Your First Pet"
+          onAction={handleOpenAddForm}
+        />
+      ) : (
+        <div className="pets-grid">
+          {pets.map((pet) => (
+            <div className="pet-card" key={pet.id}>
+              <div className="pet-avatar">
+                {pet.emoji}
+              </div>
+
+              <h2>{pet.name}</h2>
+              <p>{pet.breed}</p>
+
+              <div className="pet-details">
+                <span>{pet.species}</span>
+                <span>{pet.gender}</span>
+                <span>{pet.age}</span>
+              </div>
+
+              <div className="pet-actions">
+                <button
+                  type="button"
+                  onClick={() => handleViewPet(pet)}
+                >
+                  View
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleEditPet(pet)}
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeletePet(pet.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-
-            <h2>{pet.name}</h2>
-            <p>{pet.breed}</p>
-
-            <div className="pet-details">
-              <span>{pet.species}</span>
-              <span>{pet.gender}</span>
-              <span>{pet.age}</span>
-            </div>
-
-            <div className="pet-actions">
-              <button
-                type="button"
-                onClick={() => handleViewPet(pet)}
-              >
-                View
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleEditPet(pet)}
-              >
-                Edit
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleDeletePet(pet.id)}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+           )}
     </div>
   )
 }

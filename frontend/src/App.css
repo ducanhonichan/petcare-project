@@ -700,3 +700,111 @@ li {
   }
 }
 
+
+
+
+
+
+
+/* ===== T26: LOADING / EMPTY / ERROR STATES ===== */
+
+.state-display {
+  width: 100%;
+  min-height: 260px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px dashed #cbdedb;
+  border-radius: 20px;
+}
+
+.state-display__icon {
+  width: 68px;
+  height: 68px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: #eaf7f4;
+  font-size: 32px;
+}
+
+.state-display__title {
+  margin: 0 0 10px;
+  color: #2c7a7b;
+  font-size: 21px;
+}
+
+.state-display__message {
+  max-width: 420px;
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.state-display__button {
+  margin-top: 22px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  background: #008b83;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.state-display__button:hover {
+  background: #006e68;
+  transform: translateY(-2px);
+}
+
+.state-display--error {
+  border-color: #fecaca;
+  background: #fffafa;
+}
+
+.state-display--error .state-display__icon {
+  background: #fef2f2;
+}
+
+.state-display--error .state-display__title {
+  color: #dc2626;
+}
+
+.state-display--loading {
+  border-style: solid;
+}
+
+.state-display--loading .state-display__icon {
+  animation: state-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes state-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+
+@media (max-width: 600px) {
+  .state-display {
+    min-height: 220px;
+    padding: 30px 18px;
+  }
+
+  .state-display__title {
+    font-size: 19px;
+  }
+}
