@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
-
 import { useNavigate } from 'react-router-dom'
+import StateDisplay from '../components/StateDisplay'
 
 const emptyPet = {
   name: '',
@@ -39,26 +39,22 @@ function Pets() {
     },
   ])
 
-  // Find selected pet from the latest pets list
   const selectedPet = pets.find(
     (pet) => pet.id === selectedPetId
   )
 
-  // Open Add Pet form
   const handleOpenAddForm = () => {
     setEditingPetId(null)
     setNewPet({ ...emptyPet })
     setShowAddForm(true)
   }
 
-  // Cancel Add/Edit
   const handleCancel = () => {
     setEditingPetId(null)
     setNewPet({ ...emptyPet })
     setShowAddForm(false)
   }
 
-  // Add or Update Pet
   const handleAddPet = (e) => {
     e.preventDefault()
 
@@ -83,7 +79,6 @@ function Pets() {
     }
 
     if (editingPetId !== null) {
-      // Update existing pet
       setPets((previousPets) =>
         previousPets.map((pet) =>
           pet.id === editingPetId
@@ -92,7 +87,6 @@ function Pets() {
         )
       )
     } else {
-      // Add new pet
       setPets((previousPets) => [
         ...previousPets,
         {
@@ -106,7 +100,6 @@ function Pets() {
     handleCancel()
   }
 
-  // Delete Pet
   const handleDeletePet = (petId) => {
     const confirmed = window.confirm(
       'Are you sure you want to delete this pet?'
@@ -127,7 +120,6 @@ function Pets() {
     }
   }
 
-  // Edit Pet
   const handleEditPet = (pet) => {
     setEditingPetId(pet.id)
 
@@ -141,7 +133,6 @@ function Pets() {
     setShowAddForm(true)
   }
 
-  // View Pet
   const handleViewPet = (pet) => {
     setSelectedPetId(pet.id)
   }
@@ -279,36 +270,28 @@ function Pets() {
             </h3>
 
             <div className="pet-detail-row">
-              <span className="pet-detail-label">
-                Species
-              </span>
+              <span className="pet-detail-label">Species</span>
               <span className="pet-detail-value">
                 {selectedPet.species}
               </span>
             </div>
 
             <div className="pet-detail-row">
-              <span className="pet-detail-label">
-                Breed
-              </span>
+              <span className="pet-detail-label">Breed</span>
               <span className="pet-detail-value">
                 {selectedPet.breed}
               </span>
             </div>
 
             <div className="pet-detail-row">
-              <span className="pet-detail-label">
-                Gender
-              </span>
+              <span className="pet-detail-label">Gender</span>
               <span className="pet-detail-value">
                 {selectedPet.gender}
               </span>
             </div>
 
             <div className="pet-detail-row">
-              <span className="pet-detail-label">
-                Age
-              </span>
+              <span className="pet-detail-label">Age</span>
               <span className="pet-detail-value">
                 {selectedPet.age}
               </span>
@@ -327,55 +310,66 @@ function Pets() {
       )}
 
       {/* PET LIST */}
-      <div className="pets-grid">
-        {pets.map((pet) => (
-          <div className="pet-card" key={pet.id}>
-            <div className="pet-avatar">
-              {pet.emoji}
+      {pets.length === 0 ? (
+        <StateDisplay
+          type="empty"
+          title="No pets yet"
+          message="You haven't added any pets. Start by creating your first pet profile."
+          actionLabel="Add Your First Pet"
+          onAction={handleOpenAddForm}
+        />
+      ) : (
+        <div className="pets-grid">
+          {pets.map((pet) => (
+            <div className="pet-card" key={pet.id}>
+              <div className="pet-avatar">
+                {pet.emoji}
+              </div>
+
+              <h2>{pet.name}</h2>
+              <p>{pet.breed}</p>
+
+              <div className="pet-details">
+                <span>{pet.species}</span>
+                <span>{pet.gender}</span>
+                <span>{pet.age}</span>
+              </div>
+
+              <div className="pet-actions">
+                <button
+                  type="button"
+                  onClick={() => handleViewPet(pet)}
+                >
+                  View
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleEditPet(pet)}
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(`/pets/${pet.id}/weights`)
+                  }
+                >
+                  Weight Tracking
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDeletePet(pet.id)}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-
-            <h2>{pet.name}</h2>
-            <p>{pet.breed}</p>
-
-            <div className="pet-details">
-              <span>{pet.species}</span>
-              <span>{pet.gender}</span>
-              <span>{pet.age}</span>
-            </div>
-
-            <div className="pet-actions">
-              <button
-                type="button"
-                onClick={() => handleViewPet(pet)}
-              >
-                View
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleEditPet(pet)}
-              >
-                Edit
-              </button>
-
-<button
-  type="button"
-  onClick={() => navigate(`/pets/${pet.id}/weights`)}
->
-  Weight Tracking
-</button>
-              <button
-                type="button"
-                onClick={() => handleDeletePet(pet.id)}
-              >
-
-          
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
