@@ -9,26 +9,36 @@ import {
   Tooltip,
 } from 'recharts'
 
-const sampleData = [
-  { date: '01/10/2026', weight: 5.2 },
-  { date: '08/10/2026', weight: 5.4 },
-  { date: '15/10/2026', weight: 5.3 },
-  { date: '22/10/2026', weight: 5.6 },
-]
+function formatChartDate(value) {
+  if (!value) return ''
+
+  const date = new Date(String(value).replace(' ', 'T'))
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value)
+  }
+
+  return date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+}
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null
 
   return (
     <div className="weight-tooltip">
-      <p>{label}</p>
+     <p>{formatChartDate(label)} {String(label).slice(11, 16)}</p>
+
       <strong>{Number(payload[0].value).toFixed(2)} kg</strong>
     </div>
   )
 }
 
-function WeightChart({ data = sampleData }) {
-  const validData = Array.isArray(data)
+function WeightChart({ data = [] }) {
+    const validData = Array.isArray(data)
     ? data.filter(
         (item) =>
           item &&
@@ -91,13 +101,14 @@ function WeightChart({ data = sampleData }) {
                 data={validData}
                 margin={{ top: 15, right: 20, left: 5, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: '#64748b', fontSize: 12 }}
-                  tickLine={false}
-                  axisLine={{ stroke: '#cbd5e1' }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>
+               <XAxis
+  dataKey="date"
+  tickFormatter={formatChartDate}
+  tick={{ fill: '#64748b', fontSize: 12 }}
+  tickLine={false}
+  axisLine={{ stroke: '#cbd5e1' }}
+/>
                 <YAxis
                   domain={['auto', 'auto']}
                   unit=" kg"
@@ -120,10 +131,7 @@ function WeightChart({ data = sampleData }) {
         </>
       )}
 
-      <p className="weight-chart-note">
-        Demo data — API integration pending.
-      </p>
-    </section>
+          </section>
   )
 }
 
