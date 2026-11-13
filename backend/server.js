@@ -6,6 +6,8 @@ const pool = require('./src/config/db');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/api/auth', require('./src/routes/auth.routes'));
+app.use('/api/users', require('./src/routes/users.routes'));
 
 app.get('/', (req, res) => res.json({ message: 'API is running' }));
 
