@@ -1,6 +1,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import WeightChart from '../components/WeightChart'
 
 const API_BASE = 'http://localhost:3000/api/pets'
 
@@ -348,6 +349,25 @@ function Weights() {
           </p>
         )}
       </section>
+
+{/* T17: Weight History Chart */}
+<WeightChart
+  data={records
+    .filter(
+      (record) =>
+        record.measured_at &&
+        Number.isFinite(Number(record.weight_kg)) &&
+        Number(record.weight_kg) > 0
+    )
+    .map((record) => ({
+      date: record.measured_at,
+      weight: Number(record.weight_kg),
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date))}
+/>
+
+
+
 
       <section className="weights-card">
         <h2>Weight History</h2>
