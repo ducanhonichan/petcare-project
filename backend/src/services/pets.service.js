@@ -148,9 +148,11 @@ async function softDeletePet(petId, userId) {
 
 
 
+
 module.exports = {
   getPetsByUserId,
   createPet,
   getPetById,
   updatePet,
+  softDeletePet,
 };
