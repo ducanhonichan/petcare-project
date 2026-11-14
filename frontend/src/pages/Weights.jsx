@@ -70,13 +70,16 @@ function Weights() {
   // T10 sẽ bổ sung cơ chế xác thực chung.
   // Không tự tạo token hoặc sửa middleware của Person 2.
   const request = useCallback(async (url, options = {}) => {
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-    })
+  const token = sessionStorage.getItem('petcare_token')
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  })
 
     let result = {}
 
