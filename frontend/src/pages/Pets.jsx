@@ -1,13 +1,48 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
 
+const API_BASE = 'http://localhost:3000/api'
+
 const emptyPet = {
   name: '',
-  species: '',
+  species_id: '',
   breed: '',
   gender: 'UNKNOWN',
+}
+
+function getPetEmoji(speciesName) {
+  if (speciesName === 'Dog') return '🐶'
+  if (speciesName === 'Cat') return '🐱'
+  if (speciesName === 'Rabbit') return '🐰'
+  return '🐾'
+}
+
+function getPetAge(birthDate) {
+  if (!birthDate) return 'Unknown age'
+
+  const birth = new Date(birthDate)
+  if (Number.isNaN(birth.getTime())) return 'Unknown age'
+
+  const today = new Date()
+  let years = today.getFullYear() - birth.getFullYear()
+  let months = today.getMonth() - birth.getMonth()
+
+  if (today.getDate() < birth.getDate()) months--
+
+  if (months < 0) {
+    years--
+    months += 12
+  }
+
+  if (years < 0) return 'Unknown age'
+
+  if (years === 0) {
+    return `${months} month${months === 1 ? '' : 's'}`
+  }
+
+  return `${years} year${years === 1 ? '' : 's'}`
 }
 
 function Pets() {
@@ -18,26 +53,124 @@ function Pets() {
   const [selectedPetId, setSelectedPetId] = useState(null)
   const [newPet, setNewPet] = useState({ ...emptyPet })
 
-  const [pets, setPets] = useState([
-    {
-      id: 1,
-      name: 'Milo',
-      species: 'Dog',
-      breed: 'Golden Retriever',
-      gender: 'MALE',
-      age: '2 years',
-      emoji: '🐶',
-    },
-    {
-      id: 2,
-      name: 'Luna',
-      species: 'Cat',
-      breed: 'British Shorthair',
-      gender: 'FEMALE',
-      age: '1 year',
-      emoji: '🐱',
-    },
-  ])
+  const [pets, setPets] = useState([])
+  const [species, setSpecies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const getSpeciesName = (speciesId) => {
+    return species.find(
+      (item) => item.id === Number(speciesId)
+    )?.name || 'Unknown'
+  }
+
+  const request = async (path, options = {}) => {
+    const token = sessionStorage.getItem('petcare_token')
+
+    if (!token) {
+      throw new Error('Please sign in to manage your pets.')
+    }
+
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        ...options.headers,
+      },
+    })
+
+    const result = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error(
+          'Your session has expired. Please sign in again.'
+        )
+      }
+
+      throw new Error(result.message || 'Request failed.')
+    }
+
+    return result
+  }
+
+  const loadPets = async () => {
+    const result = await request('/pets')
+
+    if (!Array.isArray(result)) {
+      throw new Error('Invalid pets response.')
+    }
+
+    setPets(result)
+  }
+
+  useEffect(() => {
+    let active = true
+
+    const loadData = async () => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const token = sessionStorage.getItem('petcare_token')
+
+        if (!token) {
+          navigate('/login', { replace: true })
+          return
+        }
+
+        const [speciesResponse, petsResponse] = await Promise.all([
+          fetch(`${API_BASE}/species`),
+          fetch(`${API_BASE}/pets`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ])
+
+        const speciesData = await speciesResponse.json()
+        const petsData = await petsResponse.json()
+
+        if (!speciesResponse.ok) {
+          throw new Error(
+            speciesData.message || 'Unable to load species.'
+          )
+        }
+
+        if (!petsResponse.ok) {
+          throw new Error(
+            petsResponse.status === 401
+              ? 'Your session has expired. Please sign in again.'
+              : petsData.message || 'Unable to load pets.'
+          )
+        }
+
+        if (!Array.isArray(speciesData) || !Array.isArray(petsData)) {
+          throw new Error('Invalid API response.')
+        }
+
+        if (active) {
+          setSpecies(speciesData)
+          setPets(petsData)
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'Unable to load pets.')
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    loadData()
+
+    return () => {
+      active = false
+    }
+  }, [navigate])
 
   const selectedPet = pets.find(
     (pet) => pet.id === selectedPetId
@@ -46,6 +179,8 @@ function Pets() {
   const handleOpenAddForm = () => {
     setEditingPetId(null)
     setNewPet({ ...emptyPet })
+    setError('')
+    setSuccess('')
     setShowAddForm(true)
   }
 
@@ -55,68 +190,99 @@ function Pets() {
     setShowAddForm(false)
   }
 
-  const handleAddPet = (e) => {
+  const handleAddPet = async (e) => {
     e.preventDefault()
 
     const name = newPet.name.trim()
+    const speciesId = Number(newPet.species_id)
 
-    if (!name || !newPet.species) {
-      alert('Please enter pet name and select species.')
+    if (
+      !name ||
+      !Number.isSafeInteger(speciesId) ||
+      speciesId <= 0
+    ) {
+      setError('Please enter pet name and select species.')
       return
     }
 
     const petData = {
       name,
-      species: newPet.species,
-      breed: newPet.breed.trim() || 'Unknown breed',
+      species_id: speciesId,
+      breed: newPet.breed.trim() || null,
       gender: newPet.gender,
-      emoji:
-        newPet.species === 'Dog'
-          ? '🐶'
-          : newPet.species === 'Cat'
-            ? '🐱'
-            : '🐰',
     }
 
-    if (editingPetId !== null) {
-      setPets((previousPets) =>
-        previousPets.map((pet) =>
-          pet.id === editingPetId
-            ? { ...pet, ...petData }
-            : pet
+    setSaving(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      if (editingPetId !== null) {
+        // Preserve optional fields not shown in the edit form.
+        const existingPet = pets.find(
+          (pet) => pet.id === editingPetId
         )
-      )
-    } else {
-      setPets((previousPets) => [
-        ...previousPets,
-        {
-          id: Date.now(),
-          ...petData,
-          age: 'Unknown age',
-        },
-      ])
-    }
 
-    handleCancel()
+        await request(`/pets/${editingPetId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            ...petData,
+            birth_date: existingPet?.birth_date
+              ? String(existingPet.birth_date).slice(0, 10)
+              : null,
+            color: existingPet?.color ?? null,
+            avatar_url: existingPet?.avatar_url ?? null,
+            note: existingPet?.note ?? null,
+          }),
+        })
+
+        setSuccess('Pet updated successfully.')
+      } else {
+        await request('/pets', {
+          method: 'POST',
+          body: JSON.stringify(petData),
+        })
+
+        setSuccess('Pet added successfully.')
+      }
+
+      await loadPets()
+      handleCancel()
+    } catch (err) {
+      setError(err.message || 'Unable to save pet.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleDeletePet = (petId) => {
+  const handleDeletePet = async (petId) => {
     const confirmed = window.confirm(
       'Are you sure you want to delete this pet?'
     )
 
     if (!confirmed) return
 
-    setPets((previousPets) =>
-      previousPets.filter((pet) => pet.id !== petId)
-    )
+    setError('')
+    setSuccess('')
 
-    if (editingPetId === petId) {
-      handleCancel()
-    }
+    try {
+      await request(`/pets/${petId}`, {
+        method: 'DELETE',
+      })
 
-    if (selectedPetId === petId) {
-      setSelectedPetId(null)
+      await loadPets()
+
+      if (editingPetId === petId) {
+        handleCancel()
+      }
+
+      if (selectedPetId === petId) {
+        setSelectedPetId(null)
+      }
+
+      setSuccess('Pet deleted successfully.')
+    } catch (err) {
+      setError(err.message || 'Unable to delete pet.')
     }
   }
 
@@ -124,12 +290,14 @@ function Pets() {
     setEditingPetId(pet.id)
 
     setNewPet({
-      name: pet.name,
-      species: pet.species,
-      breed: pet.breed,
-      gender: pet.gender,
+      name: pet.name || '',
+      species_id: String(pet.species_id),
+      breed: pet.breed || '',
+      gender: pet.gender || 'UNKNOWN',
     })
 
+    setError('')
+    setSuccess('')
     setShowAddForm(true)
   }
 
@@ -156,6 +324,18 @@ function Pets() {
         </button>
       </div>
 
+      {error && (
+        <p role="alert" className="login-error">
+          {error}
+        </p>
+      )}
+
+      {success && (
+        <p role="status" className="weight-success">
+          {success}
+        </p>
+      )}
+
       {/* ADD / EDIT FORM */}
       {showAddForm && (
         <div className="add-pet-form">
@@ -179,6 +359,7 @@ function Pets() {
                     name: e.target.value,
                   })
                 }
+                maxLength={100}
                 required
               />
             </div>
@@ -187,19 +368,21 @@ function Pets() {
               <label htmlFor="pet-species">Species</label>
               <select
                 id="pet-species"
-                value={newPet.species}
+                value={newPet.species_id}
                 onChange={(e) =>
                   setNewPet({
                     ...newPet,
-                    species: e.target.value,
+                    species_id: e.target.value,
                   })
                 }
                 required
               >
                 <option value="">Select species</option>
-                <option value="Dog">Dog</option>
-                <option value="Cat">Cat</option>
-                <option value="Rabbit">Rabbit</option>
+                {species.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -216,6 +399,7 @@ function Pets() {
                     breed: e.target.value,
                   })
                 }
+                maxLength={100}
               />
             </div>
 
@@ -241,14 +425,17 @@ function Pets() {
               <button
                 type="button"
                 onClick={handleCancel}
+                disabled={saving}
               >
                 Cancel
               </button>
 
-              <button type="submit">
-                {editingPetId !== null
-                  ? 'Update Pet'
-                  : 'Save Pet'}
+              <button type="submit" disabled={saving}>
+                {saving
+                  ? 'Saving...'
+                  : editingPetId !== null
+                    ? 'Update Pet'
+                    : 'Save Pet'}
               </button>
             </div>
           </form>
@@ -262,7 +449,9 @@ function Pets() {
 
           <div className="pet-detail-content">
             <div className="pet-detail-avatar">
-              {selectedPet.emoji}
+              {getPetEmoji(
+                getSpeciesName(selectedPet.species_id)
+              )}
             </div>
 
             <h3 className="pet-detail-name">
@@ -272,14 +461,14 @@ function Pets() {
             <div className="pet-detail-row">
               <span className="pet-detail-label">Species</span>
               <span className="pet-detail-value">
-                {selectedPet.species}
+                {getSpeciesName(selectedPet.species_id)}
               </span>
             </div>
 
             <div className="pet-detail-row">
               <span className="pet-detail-label">Breed</span>
               <span className="pet-detail-value">
-                {selectedPet.breed}
+                {selectedPet.breed || 'Unknown breed'}
               </span>
             </div>
 
@@ -293,7 +482,7 @@ function Pets() {
             <div className="pet-detail-row">
               <span className="pet-detail-label">Age</span>
               <span className="pet-detail-value">
-                {selectedPet.age}
+                {getPetAge(selectedPet.birth_date)}
               </span>
             </div>
           </div>
@@ -310,7 +499,13 @@ function Pets() {
       )}
 
       {/* PET LIST */}
-      {pets.length === 0 ? (
+      {loading ? (
+        <StateDisplay
+          type="loading"
+          title="Loading pets..."
+          message="Fetching your pets from the database."
+        />
+      ) : !error && pets.length === 0 ? (
         <StateDisplay
           type="empty"
           title="No pets yet"
@@ -323,16 +518,20 @@ function Pets() {
           {pets.map((pet) => (
             <div className="pet-card" key={pet.id}>
               <div className="pet-avatar">
-                {pet.emoji}
+                {getPetEmoji(
+                  getSpeciesName(pet.species_id)
+                )}
               </div>
 
               <h2>{pet.name}</h2>
-              <p>{pet.breed}</p>
+              <p>{pet.breed || 'Unknown breed'}</p>
 
               <div className="pet-details">
-                <span>{pet.species}</span>
+                <span>
+                  {getSpeciesName(pet.species_id)}
+                </span>
                 <span>{pet.gender}</span>
-                <span>{pet.age}</span>
+                <span>{getPetAge(pet.birth_date)}</span>
               </div>
 
               <div className="pet-actions">
