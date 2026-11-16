@@ -1,6 +1,7 @@
 
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import StateDisplay from '../components/StateDisplay'
 import WeightChart from '../components/WeightChart'
 
 const API_BASE = 'http://localhost:3000/api/pets'
@@ -53,13 +54,37 @@ function displayDateTime(value) {
   return `${date} ${time || ''}`
 }
 
+async function request(url, options = {}) {
+  const token = sessionStorage.getItem('petcare_token')
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  })
+
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    const message = response.status === 401
+      ? 'Please sign in to access weight records.'
+      : result.message || `Request failed (${response.status}).`
+    throw Object.assign(new Error(message), { status: response.status })
+  }
+  return result
+}
+
 function Weights() {
   const { petId } = useParams()
+  return <PetWeights key={petId} petId={petId} />
+}
 
+function PetWeights({ petId }) {
+  const navigate = useNavigate()
   const [form, setForm] = useState({ ...emptyForm })
   const [editingId, setEditingId] = useState(null)
-  const [records, setRecords] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [history, setHistory] = useState(null)
+  const [reload, setReload] = useState(0)
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
   const [message, setMessage] = useState('')
@@ -67,63 +92,39 @@ function Weights() {
 
   const endpoint = `${API_BASE}/${petId}/weights`
 
-  // T10 sẽ bổ sung cơ chế xác thực chung.
-  // Không tự tạo token hoặc sửa middleware của Person 2.
-  const request = useCallback(async (url, options = {}) => {
-  const token = sessionStorage.getItem('petcare_token')
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  })
-
-    let result = {}
-
-    try {
-      result = await response.json()
-    } catch {
-      // Trường hợp server trả response không có JSON.
-    }
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error(
-          'Authentication is not available yet. Please integrate T10 before using the API.'
-        )
-      }
-
-      throw new Error(
-        result.message || `Request failed (${response.status}).`
-      )
-    }
-
-    return result
-  }, [])
-
-  const loadWeights = useCallback(async () => {
-    setLoading(true)
-    setError('')
-
-    try {
-      const result = await request(endpoint)
-
-      setRecords(
-        Array.isArray(result.data) ? result.data : []
-      )
-    } catch (err) {
-      setError(err.message || 'Unable to load weight history.')
-    } finally {
-      setLoading(false)
-    }
-  }, [endpoint, request])
+  const busy = saving || deletingId !== null
+  const records = history?.records ?? []
 
   useEffect(() => {
-    loadWeights()
-  }, [loadWeights])
+    const controller = new AbortController()
+
+    async function loadHistory() {
+      try {
+        const result = await request(endpoint, { signal: controller.signal })
+        if (!Array.isArray(result.data)) {
+          throw new Error('The server returned an invalid weight history.')
+        }
+        if (!controller.signal.aborted) setHistory({ records: result.data })
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setHistory({
+            error: error instanceof TypeError
+              ? 'Could not connect to PetCare. Check that the server is running and try again.'
+              : error.message,
+            needsLogin: error.status === 401,
+          })
+        }
+      }
+    }
+
+    void loadHistory()
+    return () => controller.abort()
+  }, [endpoint, reload])
+
+  function refreshHistory() {
+    setHistory(null)
+    setReload((value) => value + 1)
+  }
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -165,6 +166,7 @@ function Weights() {
 
   async function handleSubmit(event) {
     event.preventDefault()
+    if (busy) return
 
     setMessage('')
     setError('')
@@ -196,7 +198,7 @@ function Weights() {
       )
 
       resetForm()
-      await loadWeights()
+      refreshHistory()
 
       setMessage(
         isEditing
@@ -224,6 +226,7 @@ function Weights() {
   }
 
   async function handleDelete(recordId) {
+    if (busy) return
     const confirmed = window.confirm(
       'Are you sure you want to delete this weight record?'
     )
@@ -243,7 +246,7 @@ function Weights() {
         resetForm()
       }
 
-      await loadWeights()
+      refreshHistory()
       setMessage('Weight record deleted successfully.')
     } catch (err) {
       setError(err.message || 'Unable to delete weight record.')
@@ -322,7 +325,7 @@ function Weights() {
             />
           </div>
 
-          <button type="submit" disabled={saving}>
+          <button type="submit" disabled={busy || history === null || history.needsLogin}>
             {saving
               ? 'Saving...'
               : editingId !== null
@@ -334,7 +337,7 @@ function Weights() {
             <button
               type="button"
               onClick={resetForm}
-              disabled={saving}
+              disabled={busy}
               style={{ marginLeft: 8 }}
             >
               Cancel Edit
@@ -353,42 +356,46 @@ function Weights() {
         )}
       </section>
 
-{/* T17: Weight History Chart */}
-<WeightChart
-  data={records
-    .filter(
-      (record) =>
-        record.measured_at &&
-        Number.isFinite(Number(record.weight_kg)) &&
-        Number(record.weight_kg) > 0
-    )
-    .map((record) => ({
-      date: record.measured_at,
-      weight: Number(record.weight_kg),
-    }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))}
-/>
-
-
-
+      {records.length > 0 && (
+        <WeightChart
+          data={records
+            .filter((record) =>
+              record.measured_at &&
+              Number.isFinite(Number(record.weight_kg)) &&
+              Number(record.weight_kg) > 0
+            )
+            .map((record) => ({
+              date: record.measured_at,
+              weight: Number(record.weight_kg),
+            }))
+            .sort((a, b) => new Date(a.date) - new Date(b.date))}
+        />
+      )}
 
       <section className="weights-card">
         <h2>Weight History</h2>
 
-        <button
-          type="button"
-          onClick={loadWeights}
-          disabled={loading}
-        >
-          Refresh
-        </button>
+        {history && !history.error && (
+          <button type="button" onClick={refreshHistory} disabled={busy}>
+            Refresh
+          </button>
+        )}
 
-        {loading ? (
-          <p role="status">Loading weight history...</p>
+        {history === null ? (
+          <StateDisplay type="loading" title="Loading weight history…" />
+        ) : history.error ? (
+          <StateDisplay
+            type="error"
+            title="Could not load weight history"
+            message={history.error}
+            actionLabel={history.needsLogin ? 'Sign in' : 'Try again'}
+            onAction={history.needsLogin ? () => navigate('/login') : refreshHistory}
+          />
         ) : records.length === 0 ? (
-          <p>
-            No weight records to display.
-          </p>
+          <StateDisplay
+            title="No weight records yet"
+            message="Add a measurement to start tracking your pet’s weight."
+          />
         ) : (
           <div style={{ overflowX: 'auto', marginTop: 16 }}>
             <table
@@ -423,6 +430,7 @@ function Weights() {
                       <button
                         type="button"
                         onClick={() => handleEdit(record)}
+                        disabled={busy}
                       >
                         Edit
                       </button>
@@ -430,7 +438,7 @@ function Weights() {
                       <button
                         type="button"
                         onClick={() => handleDelete(record.id)}
-                        disabled={deletingId === record.id}
+                        disabled={busy}
                         style={{ marginLeft: 8 }}
                       >
                         {deletingId === record.id
