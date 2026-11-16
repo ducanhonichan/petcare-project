@@ -8,6 +8,7 @@ const petsRouter = require('./src/routes/pets.routes');
 const speciesRouter = require('./src/routes/species.routes');
 
 const weightsRouter = require('./src/routes/weights.routes');
+const vetVisitsRouter = require('./src/routes/vetVisits.routes');
 
 
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/pets', petsRouter);
 app.use('/api/species', speciesRouter);
 
 app.use('/api/pets', weightsRouter);
+app.use('/api/pets', vetVisitsRouter);
 
 app.get('/', (req, res) => res.json({ message: 'API is running' }));
 
