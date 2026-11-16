@@ -1,111 +1,87 @@
 
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import StateDisplay from '../components/StateDisplay'
 
 const API_BASE = 'http://localhost:3000/api'
 
 function Dashboard() {
   const navigate = useNavigate()
-  const [totalPets, setTotalPets] = useState(null)
-  const [totalWeights, setTotalWeights] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [summary, setSummary] = useState(null)
   const [error, setError] = useState('')
+  const [reload, setReload] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
+    const { signal } = controller
+    const token = sessionStorage.getItem('petcare_token')
 
-    async function loadPets() {
-      const token = sessionStorage.getItem('petcare_token')
+    async function getData(path, message) {
+      const response = await fetch(`${API_BASE}${path}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal,
+      })
+      if (!response.ok) {
+        throw Object.assign(new Error(message), { status: response.status })
+      }
+      return response.json()
+    }
 
+    async function loadSummary() {
       if (!token) {
         navigate('/login', { replace: true })
         return
       }
 
       try {
-        const response = await fetch(`${API_BASE}/pets`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          signal: controller.signal,
-        })
+        const pets = await getData('/pets', 'Unable to load your pets.')
+        if (!Array.isArray(pets)) throw new Error('Invalid pets data.')
 
-        if (response.status === 401) {
+        const weightCounts = await Promise.all(pets.map(async (pet) => {
+          const result = await getData(
+            `/pets/${pet.id}/weights`, 'Unable to load weight records.'
+          )
+          if (!Array.isArray(result.data)) throw new Error('Invalid weight records data.')
+          return result.data.length
+        }))
+
+        if (!signal.aborted) {
+          setSummary({
+            totalPets: pets.length,
+            totalWeights: weightCounts.reduce((sum, count) => sum + count, 0),
+          })
+        }
+      } catch (error) {
+        if (signal.aborted) return
+        if (error.status === 401) {
           navigate('/login', { replace: true })
-          return
-        }
-
-        if (!response.ok) {
-          throw new Error('Unable to load your pets.')
-        }
-
-        const pets = await response.json()
-
-        if (!Array.isArray(pets)) {
-          throw new Error('Invalid pets data.')
-        }
-
-        setTotalPets(pets.length)
-
-const weightResults = await Promise.all(
-  pets.map(async (pet) => {
-    const response = await fetch(
-      `${API_BASE}/pets/${pet.id}/weights`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        signal: controller.signal,
-      }
-    )
-
-    if (!response.ok) {
-      throw new Error('Unable to load weight records.')
-    }
-
-    const result = await response.json()
-
-    if (!Array.isArray(result.data)) {
-      throw new Error('Invalid weight records data.')
-    }
-
-    return result.data.length
-  })
-)
-
-const weightCount = weightResults.reduce(
-  (total, count) => total + count,
-  0
-)
-
-setTotalWeights(weightCount)
-
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError(err.message)
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false)
+        } else {
+          setError(error instanceof TypeError
+            ? 'Could not connect to PetCare. Check that the server is running and try again.'
+            : error.message)
         }
       }
     }
 
-    loadPets()
-
+    void loadSummary()
     return () => controller.abort()
-  }, [navigate])
+  }, [navigate, reload])
+
+  function retry() {
+    setError('')
+    setReload((value) => value + 1)
+  }
 
   const summaryCards = [
     {
       title: 'Total Pets',
-      value: loading ? '...' : error ? '—' : totalPets,
+      value: summary?.totalPets,
       description: 'Pets in your care',
       icon: '🐾',
     },
     {
       title: 'Weight Records',
-      value: loading ? '...' : error ? '—' : totalWeights ?? 0,
+      value: summary?.totalWeights,
       description: 'Total recorded weight measurements',
       icon: '⚖️',
     },
@@ -137,22 +113,39 @@ setTotalWeights(weightCount)
         </Link>
       </div>
 
-      {error && (
-        <p role="alert" className="dashboard-error">
-          {error}
-        </p>
+      {error ? (
+        <section className="dashboard-section">
+          <StateDisplay
+            type="error"
+            title="Could not load the dashboard"
+            message={error}
+            actionLabel="Try again"
+            onAction={retry}
+          />
+        </section>
+      ) : summary === null ? (
+        <section className="dashboard-section">
+          <StateDisplay type="loading" title="Loading your dashboard…" />
+        </section>
+      ) : summary.totalPets === 0 ? (
+        <section className="dashboard-section">
+          <StateDisplay
+            title="No pets yet"
+            message="Add a pet in My Pets to see its health records here."
+          />
+        </section>
+      ) : (
+        <div className="dashboard-grid">
+          {summaryCards.map((card) => (
+            <div className="dashboard-card" key={card.title}>
+              <div className="dashboard-card-icon">{card.icon}</div>
+              <h3>{card.title}</h3>
+              <strong>{card.value}</strong>
+              <p>{card.description}</p>
+            </div>
+          ))}
+        </div>
       )}
-
-      <div className="dashboard-grid">
-        {summaryCards.map((card) => (
-          <div className="dashboard-card" key={card.title}>
-            <div className="dashboard-card-icon">{card.icon}</div>
-            <h3>{card.title}</h3>
-            <strong>{card.value}</strong>
-            <p>{card.description}</p>
-          </div>
-        ))}
-      </div>
 
       <section className="dashboard-section">
         <h2>Recent Activities</h2>

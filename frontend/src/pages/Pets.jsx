@@ -56,6 +56,8 @@ function Pets() {
   const [pets, setPets] = useState([])
   const [species, setSpecies] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
+  const [reload, setReload] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -111,9 +113,6 @@ function Pets() {
     let active = true
 
     const loadData = async () => {
-      setLoading(true)
-      setError('')
-
       try {
         const token = sessionStorage.getItem('petcare_token')
 
@@ -141,11 +140,12 @@ function Pets() {
         }
 
         if (!petsResponse.ok) {
-          throw new Error(
+          const error = new Error(
             petsResponse.status === 401
               ? 'Your session has expired. Please sign in again.'
               : petsData.message || 'Unable to load pets.'
           )
+          throw Object.assign(error, { status: petsResponse.status })
         }
 
         if (!Array.isArray(speciesData) || !Array.isArray(petsData)) {
@@ -158,7 +158,12 @@ function Pets() {
         }
       } catch (err) {
         if (active) {
-          setError(err.message || 'Unable to load pets.')
+          setLoadError({
+            message: err instanceof TypeError
+              ? 'Could not connect to PetCare. Check that the server is running and try again.'
+              : err.message || 'Unable to load pets.',
+            needsLogin: err.status === 401,
+          })
         }
       } finally {
         if (active) setLoading(false)
@@ -170,7 +175,13 @@ function Pets() {
     return () => {
       active = false
     }
-  }, [navigate])
+  }, [navigate, reload])
+
+  function retryLoad() {
+    setLoading(true)
+    setLoadError(null)
+    setReload((value) => value + 1)
+  }
 
   const selectedPet = pets.find(
     (pet) => pet.id === selectedPetId
@@ -319,6 +330,7 @@ function Pets() {
           className="add-pet-btn"
           type="button"
           onClick={handleOpenAddForm}
+          disabled={loading || loadError !== null}
         >
           + Add New Pet
         </button>
@@ -505,7 +517,15 @@ function Pets() {
           title="Loading pets..."
           message="Fetching your pets from the database."
         />
-      ) : !error && pets.length === 0 ? (
+      ) : loadError ? (
+        <StateDisplay
+          type="error"
+          title="Could not load your pets"
+          message={loadError.message}
+          actionLabel={loadError.needsLogin ? 'Sign in' : 'Try again'}
+          onAction={loadError.needsLogin ? () => navigate('/login') : retryLoad}
+        />
+      ) : pets.length === 0 ? (
         <StateDisplay
           type="empty"
           title="No pets yet"
