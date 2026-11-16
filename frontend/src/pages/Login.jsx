@@ -1,11 +1,12 @@
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const API_URL = 'http://localhost:3000/api/auth/login'
 
 function Login() {
   const navigate = useNavigate()
+  const { state } = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -41,7 +42,9 @@ function Login() {
         JSON.stringify(result.user)
       )
 
-      navigate('/pets')
+      const returnTo = state?.returnTo
+      const isVetVisitsPath = typeof returnTo === 'string' && /^\/pets\/\d+\/visits$/.test(returnTo)
+      navigate(isVetVisitsPath ? returnTo : '/pets', { replace: isVetVisitsPath })
     } catch (err) {
       setError(err.message || 'Unable to log in')
     } finally {

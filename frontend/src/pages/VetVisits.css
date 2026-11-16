@@ -1,0 +1,141 @@
+.vet-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.vet-back {
+  color: #00756e;
+  font-weight: 600;
+}
+
+.vet-header,
+.vet-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vet-header {
+  margin: 16px 0 24px;
+}
+
+.vet-header h1,
+.vet-card h3 {
+  margin: 0;
+  color: #2c7a7b;
+}
+
+.vet-header p {
+  margin: 8px 0 0;
+  color: #475569;
+}
+
+.vet-card,
+.vet-history > .state-display {
+  padding: clamp(16px, 4vw, 28px);
+  border: 1px solid #dceae7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.vet-card h2 {
+  margin-top: 0;
+}
+
+.vet-fields {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.vet-fields,
+.vet-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.vet-fields label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.vet-fields input,
+.vet-fields textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #243447;
+  font: inherit;
+  font-weight: 400;
+}
+
+.vet-fields textarea {
+  resize: vertical;
+}
+
+.vet-page :focus-visible {
+  outline: 2px solid #008b83;
+  outline-offset: 2px;
+}
+
+.vet-page button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.vet-list {
+  display: grid;
+  gap: 16px;
+}
+
+.vet-card time {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.vet-details {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 16px;
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
+.vet-details dt {
+  font-weight: 600;
+}
+
+.vet-details dd {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.vet-delete {
+  padding: 8px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fff;
+  color: #b91c1c;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vet-delete:hover:enabled {
+  background: #fef2f2;
+}
+
+@media (max-width: 600px) {
+  .vet-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
