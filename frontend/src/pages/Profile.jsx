@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useOutletContext } from 'react-router-dom'
 import { getProfile, updateProfile } from '../api/authApi'
 import { clearSession, getToken, updateStoredUser } from '../auth/session'
 import StateDisplay from '../components/StateDisplay'
@@ -7,6 +7,7 @@ import '../styles/auth.css'
 
 function Profile() {
   const navigate = useNavigate()
+  const { retryReminders } = useOutletContext()
   const [needsLogin, setNeedsLogin] = useState(() => !getToken())
   const [profile, setProfile] = useState(null)
   const [loadError, setLoadError] = useState('')
@@ -85,7 +86,8 @@ function Profile() {
       setProfile(updated)
       setName(updated.name)
       setRemindDays(String(updated.remind_before_days))
-      updateStoredUser({ name: updated.name })
+      updateStoredUser({ name: updated.name, remind_before_days: updated.remind_before_days })
+      retryReminders()
       setSaved(true)
     } catch (error) {
       if (error.status === 401) {

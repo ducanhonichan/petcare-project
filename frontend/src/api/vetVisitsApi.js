@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api'
+import { API_BASE } from './config'
 
 function getAuthHeaders() {
   const token = sessionStorage.getItem('petcare_token')
@@ -29,7 +29,7 @@ async function handleResponse(response) {
 // Get veterinary visits of a pet
 export async function getVetVisits(petId) {
   const response = await fetch(
-    `${API_URL}/pets/${petId}/visits`,
+    `${API_BASE}/pets/${petId}/visits`,
     {
       headers: getAuthHeaders(),
     }
@@ -41,7 +41,7 @@ export async function getVetVisits(petId) {
 // Create a veterinary visit
 export async function createVetVisit(petId, visitData) {
   const response = await fetch(
-    `${API_URL}/pets/${petId}/visits`,
+    `${API_BASE}/pets/${petId}/visits`,
     {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -55,7 +55,7 @@ export async function createVetVisit(petId, visitData) {
 // Delete a veterinary visit
 export async function deleteVetVisit(petId, visitId) {
   const response = await fetch(
-    `${API_URL}/pets/${petId}/visits/${visitId}`,
+    `${API_BASE}/pets/${petId}/visits/${visitId}`,
     {
       method: 'DELETE',
       headers: getAuthHeaders(),

@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api'
+import { API_BASE } from './config'
 
 function getAuthHeaders() {
   const token = sessionStorage.getItem('petcare_token')
@@ -30,7 +30,7 @@ async function handleResponse(response) {
 }
 
 function request(path, options = {}) {
-  return fetch(`${API_URL}${path}`, {
+  return fetch(`${API_BASE}${path}`, {
     ...options,
     headers: getAuthHeaders(),
   }).then(handleResponse)

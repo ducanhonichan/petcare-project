@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useOutletContext } from 'react-router-dom'
 import {
   createVaccination,
   deleteVaccination,
@@ -57,6 +57,7 @@ function Vaccinations() {
 }
 
 function PetVaccinations({ petId }) {
+  const { retryReminders } = useOutletContext()
   const [pet, setPet] = useState(null)
   const [types, setTypes] = useState([])
   const [records, setRecords] = useState(null)
@@ -204,6 +205,7 @@ function PetVaccinations({ petId }) {
 
     try {
       await request()
+      retryReminders()
       reloadHistory()
     } catch (error) {
       if (error.status === 401) {

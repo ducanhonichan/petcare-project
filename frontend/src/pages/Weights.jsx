@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
 import WeightChart from '../components/WeightChart'
 
-const API_BASE = 'http://localhost:3000/api/pets'
+import { API_BASE } from '../api/config'
 
 const emptyForm = {
   weight_kg: '',
@@ -90,7 +90,7 @@ function PetWeights({ petId }) {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  const endpoint = `${API_BASE}/${petId}/weights`
+  const endpoint = `${API_BASE}/pets/${petId}/weights`
 
   const busy = saving || deletingId !== null
   const records = history?.records ?? []
@@ -366,6 +366,7 @@ function PetWeights({ petId }) {
             )
             .map((record) => ({
               date: record.measured_at,
+              localDay: toInputDateTime(record.measured_at).slice(0, 10),
               weight: Number(record.weight_kg),
             }))
             .sort((a, b) => new Date(a.date) - new Date(b.date))}
