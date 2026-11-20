@@ -1,5 +1,7 @@
 ﻿import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainLayout from './components/MainLayout'
+import Register from './pages/Register'
+import Profile from './pages/Profile'
 import Home from './pages/Home'
 import Pets from './pages/Pets'
 import Dashboard from './pages/Dashboard'
@@ -12,10 +14,12 @@ function App() {
     <BrowserRouter>
       <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/pets" element={<Pets />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
           <Route
             path="/pets/:petId/weights"
             element={<Weights />}

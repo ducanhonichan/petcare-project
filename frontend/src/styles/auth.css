@@ -1,0 +1,229 @@
+/* ===== Sign in / Sign up (these classes were used by Login.jsx but unstyled) ===== */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #dceae7;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.login-card h1 {
+  margin: 0 0 6px;
+  color: #2c7a7b;
+  font-size: 28px;
+  text-align: center;
+}
+
+.login-card > p:first-of-type {
+  margin: 0 0 24px;
+  color: #667085;
+  text-align: center;
+}
+
+.login-card form,
+.profile-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-card label,
+.profile-card label {
+  margin-top: 8px;
+  color: #344054;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-card input,
+.profile-card input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #243447;
+  font-size: 15px;
+}
+
+.login-card input:focus,
+.profile-card input:focus {
+  outline: 2px solid #008b83;
+  outline-offset: 1px;
+}
+
+.login-card form button,
+.profile-card form button {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #008b83;
+  border-radius: 10px;
+  background: #008b83;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-card form button:hover:enabled,
+.profile-card form button:hover:enabled {
+  background: #006f69;
+}
+
+.login-card form button:disabled,
+.profile-card form button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.login-error {
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.auth-switch {
+  margin: 22px 0 0;
+  color: #667085;
+  font-size: 14px;
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #008b83;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Profile ===== */
+
+.profile-page {
+  max-width: 480px;
+  margin: 24px auto;
+}
+
+.profile-card {
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #dceae7;
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.profile-card h1 {
+  margin: 0 0 20px;
+  color: #2c7a7b;
+  font-size: 28px;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e6f4f3;
+  color: #008b83;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.profile-info {
+  margin: 0 0 20px;
+}
+
+.profile-info > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.profile-info dt {
+  color: #667085;
+  font-size: 14px;
+}
+
+.profile-info dd {
+  margin: 0;
+  color: #243447;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.profile-saved {
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  border: 1px solid #b7e4de;
+  border-radius: 10px;
+  background: #e6f4f3;
+  color: #00756e;
+  font-size: 14px;
+}
+
+.profile-logout {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid #008b83;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #008b83;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-logout:hover {
+  background: #e6f4f3;
+}
+
+/* ===== Navbar log out button ===== */
+
+.navbar-logout {
+  padding: 8px 16px;
+  border: 1px solid #008b83;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #008b83;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.navbar-logout:hover {
+  background: #e6f4f3;
+}
+
+@media (max-width: 480px) {
+  .login-card,
+  .profile-card {
+    padding: 24px 20px;
+  }
+}

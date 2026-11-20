@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 const API_URL = 'http://localhost:3000/api/auth/login'
 
@@ -87,6 +87,10 @@ function Login() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+
+        <p className="auth-switch">
+          New to PetCare? <Link to="/register">Create an account</Link>
+        </p>
       </section>
     </main>
   )
