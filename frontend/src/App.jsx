@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Weights from './pages/Weights'
 import Login from './pages/Login'
 import VetVisits from './pages/VetVisits'
+import Vaccinations from './pages/Vaccinations'
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
   path="/pets/:petId/visits"
   element={<VetVisits />}
 />
+          <Route
+            path="/pets/:petId/vaccinations"
+            element={<Vaccinations />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

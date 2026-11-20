@@ -43,8 +43,8 @@ function Login() {
       )
 
       const returnTo = state?.returnTo
-      const isVetVisitsPath = typeof returnTo === 'string' && /^\/pets\/\d+\/visits$/.test(returnTo)
-      navigate(isVetVisitsPath ? returnTo : '/pets', { replace: isVetVisitsPath })
+      const isReturnPath = typeof returnTo === 'string' && /^\/pets\/\d+\/(visits|vaccinations)$/.test(returnTo)
+      navigate(isReturnPath ? returnTo : '/pets', { replace: isReturnPath })
     } catch (err) {
       setError(err.message || 'Unable to log in')
     } finally {
