@@ -42,5 +42,6 @@ Frontend local mặc định gọi `http://localhost:3000/api`. Có thể đặt
 
 - [Phạm vi và phân công](docs/project-scope.md)
 - [Sơ đồ cơ sở dữ liệu](docs/petcare-erd.png)
+- [Email nhắc lịch T27](docs/email-reminders.md)
 - [Kiểm thử và bàn giao](docs/qa-and-handoff.md)
 - [Kịch bản demo và ôn vấn đáp](docs/demo-and-qa-prep.md)
