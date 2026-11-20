@@ -9,6 +9,8 @@ const speciesRouter = require('./src/routes/species.routes');
 
 const weightsRouter = require('./src/routes/weights.routes');
 const vetVisitsRouter = require('./src/routes/vetVisits.routes');
+const vaccinationsRouter = require('./src/routes/vaccinations.routes');
+const remindersRouter = require('./src/routes/reminders.routes');
 
 
 const app = express();
@@ -24,6 +26,12 @@ app.use('/api/species', speciesRouter);
 
 app.use('/api/pets', weightsRouter);
 app.use('/api/pets', vetVisitsRouter);
+
+// T18: vaccine types + vaccination history (paths are written inside the router)
+app.use('/api', vaccinationsRouter);
+
+// T20: vaccination reminders
+app.use('/api/reminders', remindersRouter);
 
 app.get('/', (req, res) => res.json({ message: 'API is running' }));
 
