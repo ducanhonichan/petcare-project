@@ -587,6 +587,13 @@ function Pets() {
 
                 <button
                   type="button"
+                  onClick={() => navigate(`/pets/${pet.id}/vaccinations`)}
+                >
+                  Vaccinations
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => handleDeletePet(pet.id)}
                 >
                   Delete

@@ -1,0 +1,248 @@
+.vacc-page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.vacc-back {
+  color: #00756e;
+  font-weight: 600;
+}
+
+.vacc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 0 24px;
+}
+
+.vacc-header h1 {
+  margin: 0;
+  color: #2c7a7b;
+}
+
+.vacc-header p {
+  margin: 8px 0 0;
+  color: #475569;
+}
+
+.vacc-card,
+.vacc-history > .state-display,
+.vacc-table-wrap {
+  padding: clamp(16px, 4vw, 28px);
+  border: 1px solid #dceae7;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+}
+
+.vacc-card {
+  margin-bottom: 24px;
+}
+
+.vacc-card h2,
+.vacc-history h2 {
+  margin-top: 0;
+}
+
+.vacc-fields {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.vacc-fields label {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.vacc-fields small {
+  color: #667085;
+  font-weight: 400;
+}
+
+.vacc-fields input,
+.vacc-fields select,
+.vacc-fields textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #243447;
+  font: inherit;
+  font-weight: 400;
+}
+
+.vacc-fields textarea {
+  resize: vertical;
+}
+
+.vacc-wide {
+  grid-column: 1 / -1;
+}
+
+.vacc-page :focus-visible {
+  outline: 2px solid #008b83;
+  outline-offset: 2px;
+}
+
+.vacc-page button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+/* ===== Table ===== */
+
+.vacc-table-wrap {
+  padding: 8px 16px;
+  overflow-x: auto;
+}
+
+.vacc-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vacc-table th,
+.vacc-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: top;
+}
+
+.vacc-table th {
+  color: #667085;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.vacc-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.vacc-note {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.vacc-badge {
+  display: block;
+  width: fit-content;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.vacc-badge--overdue {
+  background: #fef2f2;
+  color: #b42318;
+}
+
+.vacc-badge--due_soon {
+  background: #fffaeb;
+  color: #b54708;
+}
+
+.vacc-badge--later {
+  background: #e6f4f3;
+  color: #00756e;
+}
+
+.vacc-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.vacc-actions button {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  color: #344054;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.vacc-actions button:hover:enabled {
+  background: #f1f5f9;
+}
+
+.vacc-actions .vacc-delete {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.vacc-actions .vacc-delete:hover:enabled {
+  background: #fef2f2;
+}
+
+/* ===== Phone: each row becomes a card ===== */
+
+@media (max-width: 640px) {
+  .vacc-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vacc-table thead {
+    display: none;
+  }
+
+  .vacc-table,
+  .vacc-table tbody,
+  .vacc-table tr,
+  .vacc-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .vacc-table tr {
+    padding: 12px 0;
+    border-bottom: 1px solid #eef2f6;
+  }
+
+  .vacc-table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .vacc-table td {
+    padding: 4px 0;
+    border: 0;
+  }
+
+  .vacc-table td[data-label]::before {
+    content: attr(data-label) ': ';
+    color: #667085;
+    font-size: 0.85rem;
+  }
+
+  .vacc-table td[data-label='Vaccine']::before {
+    content: '';
+  }
+
+  .vacc-actions {
+    margin-top: 6px;
+    text-align: left;
+  }
+
+  .vacc-actions button:first-child {
+    margin-left: 0;
+  }
+}
