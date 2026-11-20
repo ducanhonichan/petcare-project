@@ -37,8 +37,32 @@ async function getUserProfile(userId) {
   return rows[0] || null;
 }
 
+// Cap nhat ho so: chi cac truong duoc gui len (name, remind_before_days)
+async function updateUserProfile(userId, { name, remind_before_days }) {
+  const fields = [];
+  const params = [];
+
+  if (name !== undefined) {
+    fields.push('name = ?');
+    params.push(name);
+  }
+
+  if (remind_before_days !== undefined) {
+    fields.push('remind_before_days = ?');
+    params.push(remind_before_days);
+  }
+
+  params.push(userId);
+
+  await pool.query(
+    `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
+    params
+  );
+}
+
 module.exports = {
   findUserByEmail,
   createUser,
   getUserProfile,
+  updateUserProfile,
 };
