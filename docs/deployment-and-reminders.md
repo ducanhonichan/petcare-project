@@ -18,7 +18,7 @@ The frontend calls `GET /api/reminders/upcoming` with the current user's Bearer 
 
 The response mapping is implemented in `frontend/src/api/remindersApi.js`. A missing route shows unavailable status. A failed request or invalid response shows a retry action. A valid pair of zero counts displays both cards with zero and hides the badge.
 
-## T27 Morning email draft
+## T27 Morning email worker
 
 **Subject:** PetCare — Vaccinations due soon
 
@@ -44,3 +44,5 @@ Verify the following with a stub mail transport before enabling real delivery:
 - Only the latest dose per pet and vaccine contributes. Multiple pets for one owner appear in one email, and each owner receives only their own records.
 - A repeated run for the same date or a restart can retry failed deliveries without repeating successful sends. Decide where to persist delivery results before enabling the schedule.
 - A transport failure is observable without exposing credentials or blocking unrelated recipients.
+
+Implementation and operation instructions are in [T27 email reminders](email-reminders.md).

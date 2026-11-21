@@ -42,4 +42,4 @@ Các thao tác tạo/sửa/xóa của kiểm thử tự động dùng dữ liệ
 | T27 | Đồng ý phương án lưu lịch sử gửi nếu cần bảng mới | Tránh gửi trùng khi restart hoặc chạy lại |
 | T35–T37 | Nội dung TV2 trình bày, URL Swagger nếu có và dữ liệu demo được phép chỉnh | Ghép báo cáo, slide và tập demo chung |
 
-T20 đã có getLatestDoses và getRemindBeforeDays trong backend/src/services/reminders.service.js để dùng lại khi triển khai email. T27 hiện có mẫu email và các ca kiểm thử trong deployment-and-reminders.md.
+T20 đã có getLatestDoses và getRemindBeforeDays trong backend/src/services/reminders.service.js để dùng lại khi triển khai email. T27 đã có worker, dry-run và kiểm thử tự động trong nhánh feature/T27-email-reminders. Xem email-reminders.md. Còn chờ nghiệm thu SMTP thật và cấu hình lịch trên host.
