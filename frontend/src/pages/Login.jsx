@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-const API_URL = 'http://localhost:3000/api/auth/login'
+import { API_BASE } from '../api/config'
+import { saveSession } from '../auth/session'
 
 function Login() {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ function Login() {
     setLoading(true)
 
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,11 +37,7 @@ function Login() {
         throw new Error('No authentication token received')
       }
 
-      sessionStorage.setItem('petcare_token', result.token)
-      sessionStorage.setItem(
-        'petcare_user',
-        JSON.stringify(result.user)
-      )
+      saveSession(result.token, result.user)
 
       const returnTo = state?.returnTo
       const isReturnPath = typeof returnTo === 'string' && /^\/pets\/\d+\/(visits|vaccinations)$/.test(returnTo)

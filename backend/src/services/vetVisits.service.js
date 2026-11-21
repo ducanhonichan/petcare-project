@@ -4,7 +4,7 @@ const pool = require('../config/db');
 // Check whether a pet belongs to the authenticated user
 async function checkPetOwnership(petId, userId) {
   const [rows] = await pool.query(
-    'SELECT id FROM pets WHERE id = ? AND user_id = ?',
+    'SELECT id FROM pets WHERE id = ? AND user_id = ? AND is_active = TRUE',
     [petId, userId]
   );
 

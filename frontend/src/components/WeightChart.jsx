@@ -1,4 +1,5 @@
 
+import { useState } from 'react'
 import {
   ResponsiveContainer,
   LineChart,
@@ -8,6 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts'
+import StateDisplay from './StateDisplay'
 
 function formatChartDate(value) {
   if (!value) return ''
@@ -38,7 +40,10 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function WeightChart({ data = [] }) {
-    const validData = Array.isArray(data)
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const invalidRange = Boolean(startDate && endDate && startDate > endDate)
+  const validData = Array.isArray(data)
     ? data.filter(
         (item) =>
           item &&
@@ -48,17 +53,19 @@ function WeightChart({ data = [] }) {
       )
     : []
 
-  const latestWeight = validData.length
-    ? validData[validData.length - 1].weight
-    : null
+  const visibleData = validData.filter(({ localDay }) =>
+    (!startDate || localDay >= startDate) && (!endDate || localDay <= endDate)
+  )
+  const weights = visibleData.map((item) => Number(item.weight))
+  const latestWeight = weights.at(-1)
+  const highestWeight = Math.max(...weights)
+  const lowestWeight = Math.min(...weights)
+  const change = weights.length > 1 ? latestWeight - weights[0] : null
 
-  const highestWeight = validData.length
-    ? Math.max(...validData.map((item) => Number(item.weight)))
-    : null
-
-  const lowestWeight = validData.length
-    ? Math.min(...validData.map((item) => Number(item.weight)))
-    : null
+  function resetRange() {
+    setStartDate('')
+    setEndDate('')
+  }
 
   return (
     <section className="weights-card weight-chart-card">
@@ -70,12 +77,33 @@ function WeightChart({ data = [] }) {
         <span className="weight-unit">KG</span>
       </div>
 
-      {validData.length === 0 ? (
-        <div className="weight-chart-empty">
-          <div className="weight-chart-empty__icon">🐾</div>
-          <h3>No weight records yet</h3>
-          <p>Add your first weight record to see your pet's progress.</p>
-        </div>
+      {validData.length > 0 && (
+        <fieldset className="weight-date-range">
+          <legend>Filter chart by date</legend>
+          <label>
+            From
+            <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+          </label>
+          <label>
+            To
+            <input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+          </label>
+          <button type="button" onClick={resetRange} disabled={!startDate && !endDate}>
+            Clear dates
+          </button>
+        </fieldset>
+      )}
+
+      {invalidRange ? (
+        <StateDisplay type="error" title="Invalid date range"
+          message="The start date must be on or before the end date." />
+      ) : validData.length === 0 ? (
+        <StateDisplay title="No weight records yet"
+          message="Add a measurement to see the chart." />
+      ) : visibleData.length === 0 ? (
+        <StateDisplay title="No weight records in this range"
+          message="Try a different date range or clear the filters."
+          actionLabel="Clear dates" onAction={resetRange} />
       ) : (
         <>
           <div className="weight-summary">
@@ -93,12 +121,16 @@ function WeightChart({ data = [] }) {
               <span>Lowest Weight</span>
               <strong>{Number(lowestWeight).toFixed(2)} kg</strong>
             </div>
+            <div className="weight-summary-item">
+              <span>Weight Change</span>
+              <strong>{change == null ? '—' : `${change > 0 ? '+' : ''}${change.toFixed(2)} kg`}</strong>
+            </div>
           </div>
 
           <div className="weight-chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={validData}
+                data={visibleData}
                 margin={{ top: 15, right: 20, left: 5, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0"/>

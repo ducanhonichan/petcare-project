@@ -1,6 +1,6 @@
 import { getToken } from '../auth/session'
 
-const API_URL = 'http://localhost:3000/api'
+import { API_BASE } from './config'
 
 async function handleResponse(response) {
   const data = await response.json().catch(() => ({}))
@@ -33,7 +33,7 @@ function authHeaders() {
 
 // Create an account. Returns { token, user }
 export function registerUser({ name, email, password }) {
-  return fetch(`${API_URL}/auth/register`, {
+  return fetch(`${API_BASE}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password }),
@@ -41,14 +41,14 @@ export function registerUser({ name, email, password }) {
 }
 
 export function getProfile() {
-  return fetch(`${API_URL}/users/me`, {
+  return fetch(`${API_BASE}/users/me`, {
     headers: authHeaders(),
   }).then(handleResponse)
 }
 
 // Update name and/or remind_before_days. Returns the new profile.
 export function updateProfile(changes) {
-  return fetch(`${API_URL}/users/me`, {
+  return fetch(`${API_BASE}/users/me`, {
     method: 'PUT',
     headers: authHeaders(),
     body: JSON.stringify(changes),

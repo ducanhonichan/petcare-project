@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
 
-const API_BASE = 'http://localhost:3000/api'
+import { API_BASE } from '../api/config'
 
 const emptyPet = {
   name: '',

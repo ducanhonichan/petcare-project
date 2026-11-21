@@ -1,12 +1,13 @@
 
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
 
-const API_BASE = 'http://localhost:3000/api'
+import { API_BASE } from '../api/config'
 
 function Dashboard() {
   const navigate = useNavigate()
+  const { reminders, retryReminders } = useOutletContext()
   const [summary, setSummary] = useState(null)
   const [error, setError] = useState('')
   const [reload, setReload] = useState(0)
@@ -86,12 +87,6 @@ function Dashboard() {
       icon: '⚖️',
     },
     {
-      title: 'Upcoming Vaccinations',
-      value: '—',
-      description: 'API integration pending',
-      icon: '💉',
-    },
-    {
       title: 'Vet Visits',
       value: '—',
       description: 'API integration pending',
@@ -105,7 +100,6 @@ function Dashboard() {
         <div>
           <h1>Dashboard</h1>
           <p>An overview of your pets' health and activities.</p>
-          <small>Live pet data — other integrations pending</small>
         </div>
 
         <Link to="/pets" className="dashboard-action">
@@ -146,6 +140,36 @@ function Dashboard() {
           ))}
         </div>
       )}
+
+      <section className="dashboard-section">
+        <h2>Vaccination Reminders</h2>
+        {reminders.status === 'loading' ? (
+          <StateDisplay type="loading" title="Loading vaccination reminders…" />
+        ) : reminders.status === 'error' ? (
+          <StateDisplay
+            type="error"
+            title="Could not load vaccination reminders"
+            message="Try again to refresh your reminder counts."
+            actionLabel="Try again"
+            onAction={retryReminders}
+          />
+        ) : reminders.status === 'ready' ? (
+          <div className="dashboard-grid">
+            <div className="dashboard-card reminder-card reminder-card--overdue">
+              <h3>Overdue</h3>
+              <strong>{reminders.overdue}</strong>
+              <p>{reminders.overdue ? 'Vaccinations past their due date' : 'No overdue vaccinations'}</p>
+            </div>
+            <div className="dashboard-card reminder-card reminder-card--upcoming">
+              <h3>Due Soon</h3>
+              <strong>{reminders.upcoming}</strong>
+              <p>{reminders.upcoming ? 'Vaccinations within your reminder window' : 'No vaccinations due soon'}</p>
+            </div>
+          </div>
+        ) : (
+          <p>Vaccination reminders are not available yet.</p>
+        )}
+      </section>
 
       <section className="dashboard-section">
         <h2>Recent Activities</h2>
