@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const pool = require('./src/config/db');
+const openapiSpec = require('./src/docs/openapi');
 
 const petsRouter = require('./src/routes/pets.routes');
 
@@ -16,6 +18,18 @@ const remindersRouter = require('./src/routes/reminders.routes');
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// T29: API documentation (Swagger UI) at /api-docs, raw OpenAPI JSON at /api-docs.json
+app.get('/api-docs.json', (req, res) => res.json(openapiSpec));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, {
+    customSiteTitle: 'PetCare API Docs',
+    swaggerOptions: { persistAuthorization: true },
+  })
+);
+
 app.use('/api/auth', require('./src/routes/auth.routes'));
 app.use('/api/users', require('./src/routes/users.routes'));
 
