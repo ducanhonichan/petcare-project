@@ -7,9 +7,8 @@ VALUES
     (1, 'Dog'),
     (2, 'Cat'),
     (3, 'Rabbit')
-AS new_species
 ON DUPLICATE KEY UPDATE
-    name = new_species.name;
+    name = VALUES(name);
 
 
 
@@ -68,10 +67,9 @@ VALUES
         '$2b$12$ON8LPA2QUIvEjp6U9.OZzeUF2ZCMGQaPtBEXTEMgVZhf6LijO15Oa',
         'ADMIN'
         )
-AS new_user
 ON DUPLICATE KEY UPDATE
-    name = new_user.name,
-    role = new_user.role;
+    name = VALUES(name),
+    role = VALUES(role);
 
 
 
@@ -201,10 +199,9 @@ VALUES
         '2026-10-01 09:00:00',
         'Monthly weight check'
        )
-AS new_weight
 ON DUPLICATE KEY UPDATE
-    weight_kg = new_weight.weight_kg,
-    note = new_weight.note;
+    weight_kg = VALUES(weight_kg),
+    note = VALUES(note);
     
 
 
