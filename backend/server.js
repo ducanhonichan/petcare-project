@@ -34,6 +34,8 @@ app.use('/api/auth', require('./src/routes/auth.routes'));
 app.use('/api/users', require('./src/routes/users.routes'));
 
 app.use('/api/pets', petsRouter);
+app.use('/api/pets', require('./src/routes/petPhotos.routes'));
+app.use('/api/dashboard', require('./src/routes/dashboard.routes'));
 
 
 app.use('/api/species', speciesRouter);

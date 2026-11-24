@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
+import PetAvatar from '../components/PetAvatar'
+import PetPhotoUpload from '../components/PetPhotoUpload'
 
 import { API_BASE } from '../api/config'
 
@@ -461,11 +463,12 @@ function Pets() {
 
           <div className="pet-detail-content">
             <div className="pet-detail-avatar">
-              {getPetEmoji(
-                getSpeciesName(selectedPet.species_id)
-              )}
+              <PetAvatar pet={selectedPet} fallback={getPetEmoji(getSpeciesName(selectedPet.species_id))} />
             </div>
 
+            <PetPhotoUpload key={selectedPet.id} pet={selectedPet} onSaved={(avatarUrl) => {
+              setPets((current) => current.map((pet) => pet.id === selectedPet.id ? { ...pet, avatar_url: avatarUrl } : pet))
+            }} />
             <h3 className="pet-detail-name">
               {selectedPet.name}
             </h3>
@@ -538,9 +541,7 @@ function Pets() {
           {pets.map((pet) => (
             <div className="pet-card" key={pet.id}>
               <div className="pet-avatar">
-                {getPetEmoji(
-                  getSpeciesName(pet.species_id)
-                )}
+                <PetAvatar pet={pet} fallback={getPetEmoji(getSpeciesName(pet.species_id))} />
               </div>
 
               <h2>{pet.name}</h2>
