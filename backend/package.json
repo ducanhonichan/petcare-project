@@ -13,7 +13,8 @@
     "test:reminders": "node --test test/reminderEmails.test.js",
     "test:photos-dashboard": "node --test test/photos-dashboard.test.js",
     "test:admin": "node --test test/admin.test.js",
-    "test:validation": "node --test test/validation.test.js"
+    "test:validation": "node --test test/validation.test.js",
+    "test:weights": "node --test test/weights.test.js"
   },
   "keywords": [],
   "author": "",
