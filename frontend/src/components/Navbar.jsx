@@ -30,6 +30,9 @@ function Navbar({ reminderCount = 0 }) {
               )}
             </NavLink>
             <NavLink to="/pets" className={linkClass}>My Pets</NavLink>
+            {user.role === 'ADMIN' && (
+              <NavLink to="/admin" className={linkClass}>Admin</NavLink>
+            )}
             <NavLink to="/profile" className={linkClass}>{user.name || 'Profile'}</NavLink>
             <button type="button" className="navbar-logout" onClick={handleLogout}>
               Log out

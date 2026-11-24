@@ -11,7 +11,8 @@
     "reminders:send": "node src/jobs/reminderEmails.js --send",
     "reminders:schedule": "node src/jobs/reminderEmails.js --schedule --send",
     "test:reminders": "node --test test/reminderEmails.test.js",
-    "test:photos-dashboard": "node --test test/photos-dashboard.test.js"
+    "test:photos-dashboard": "node --test test/photos-dashboard.test.js",
+    "test:admin": "node --test test/admin.test.js"
   },
   "keywords": [],
   "author": "",
