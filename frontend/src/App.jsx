@@ -9,6 +9,7 @@ import Weights from './pages/Weights'
 import Login from './pages/Login'
 import VetVisits from './pages/VetVisits'
 import Vaccinations from './pages/Vaccinations'
+import Admin from './pages/Admin'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/pets" element={<Pets />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<Admin />} />
           <Route
             path="/pets/:petId/weights"
             element={<Weights />}

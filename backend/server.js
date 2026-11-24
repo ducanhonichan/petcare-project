@@ -37,6 +37,9 @@ app.use('/api/pets', petsRouter);
 app.use('/api/pets', require('./src/routes/petPhotos.routes'));
 app.use('/api/dashboard', require('./src/routes/dashboard.routes'));
 
+// T22/T23: admin only (users, vaccine types)
+app.use('/api/admin', require('./src/routes/admin.routes'));
+
 
 app.use('/api/species', speciesRouter);
 

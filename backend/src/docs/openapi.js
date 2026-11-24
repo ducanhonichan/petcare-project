@@ -110,6 +110,10 @@ const openapi = {
       description: 'Vaccine types and the vaccination history of a pet',
     },
     {
+      name: 'Admin',
+      description: 'Admin only (role ADMIN): manage users and vaccine types',
+    },
+    {
       name: 'Reminders',
       description: 'Vaccinations that are overdue or due soon',
     },
@@ -569,6 +573,133 @@ const openapi = {
     },
 
     // ---------------------------------------------------------- Vaccinations
+    '/api/admin/users': {
+      get: {
+        tags: ['Admin'],
+        summary: 'List all users',
+        description: 'Admin only. Newest accounts first.',
+        security: auth,
+        responses: {
+          200: jsonResponse('Users', { type: 'array', items: ref('AdminUser') }),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          500: R500,
+        },
+      },
+    },
+    '/api/admin/users/{id}/status': {
+      put: {
+        tags: ['Admin'],
+        summary: 'Ban or unban a user',
+        description:
+          'Admin only. A banned user cannot log in and old tokens stop working. Admin accounts cannot be banned.',
+        security: auth,
+        parameters: [idParam('id', 'ID of the user')],
+        requestBody: jsonBody('AdminUserStatusRequest', { is_banned: true }),
+        responses: {
+          200: jsonResponse('Status changed', {
+            type: 'object',
+            properties: {
+              message: { type: 'string', example: 'User banned' },
+              user: ref('AdminUser'),
+            },
+          }),
+          400: errorResponse('Invalid ID, is_banned is not a boolean, or target is an admin', 'is_banned must be true or false'),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          404: errorResponse('User does not exist', 'User not found'),
+          500: R500,
+        },
+      },
+    },
+    '/api/admin/vaccine-types': {
+      get: {
+        tags: ['Admin'],
+        summary: 'List all vaccine types (including hidden)',
+        description: 'Admin only. Unlike GET /api/vaccine-types this also returns hidden types.',
+        security: auth,
+        responses: {
+          200: jsonResponse('Vaccine types', { type: 'array', items: ref('AdminVaccineType') }),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          500: R500,
+        },
+      },
+      post: {
+        tags: ['Admin'],
+        summary: 'Create a vaccine type',
+        description: 'Admin only.',
+        security: auth,
+        requestBody: jsonBody('AdminVaccineTypeInput', {
+          name: 'Rabies - Rabbit',
+          species_id: 4,
+          interval_days: 365,
+          description: 'Yearly booster',
+        }),
+        responses: {
+          201: jsonResponse('Created', {
+            type: 'object',
+            properties: {
+              message: { type: 'string', example: 'Vaccine type created' },
+              data: ref('AdminVaccineType'),
+            },
+          }),
+          400: errorResponse('Invalid input', 'Name must be 1 to 150 characters'),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          500: R500,
+        },
+      },
+    },
+    '/api/admin/vaccine-types/{id}': {
+      put: {
+        tags: ['Admin'],
+        summary: 'Update a vaccine type',
+        description:
+          'Admin only. Send the full object. Send is_active true to show a hidden type again.',
+        security: auth,
+        parameters: [idParam('id', 'ID of the vaccine type')],
+        requestBody: jsonBody('AdminVaccineTypeInput', {
+          name: 'Rabies - Rabbit',
+          species_id: 4,
+          interval_days: 365,
+          is_active: true,
+        }),
+        responses: {
+          200: jsonResponse('Updated', {
+            type: 'object',
+            properties: {
+              message: { type: 'string', example: 'Vaccine type updated' },
+              data: ref('AdminVaccineType'),
+            },
+          }),
+          400: errorResponse('Invalid input', 'A valid species_id is required'),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          404: errorResponse('Vaccine type does not exist', 'Vaccine type not found'),
+          500: R500,
+        },
+      },
+      delete: {
+        tags: ['Admin'],
+        summary: 'Hide a vaccine type',
+        description:
+          'Admin only. Sets is_active = false instead of deleting, so old vaccinations keep their vaccine name.',
+        security: auth,
+        parameters: [idParam('id', 'ID of the vaccine type')],
+        responses: {
+          200: jsonResponse('Hidden', {
+            type: 'object',
+            properties: { message: { type: 'string', example: 'Vaccine type hidden' } },
+          }),
+          400: errorResponse('ID is not a positive integer', 'Invalid vaccine type ID'),
+          401: R401,
+          403: errorResponse('The user is not an admin', 'Admin access required'),
+          404: errorResponse('Vaccine type does not exist', 'Vaccine type not found'),
+          500: R500,
+        },
+      },
+    },
     '/api/vaccine-types': {
       get: {
         tags: ['Vaccinations'],
@@ -931,6 +1062,46 @@ const openapi = {
             example: 250000,
           },
           note: { type: 'string', nullable: true },
+        },
+      },
+      AdminUser: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 2 },
+          name: { type: 'string', example: 'Demo User' },
+          email: { type: 'string', example: 'demo@petcare.com' },
+          role: { type: 'string', enum: ['USER', 'ADMIN'], example: 'USER' },
+          is_banned: { type: 'boolean', example: false },
+          created_at: { type: 'string', format: 'date-time' },
+          pet_count: { type: 'integer', example: 3 },
+        },
+      },
+      AdminUserStatusRequest: {
+        type: 'object',
+        required: ['is_banned'],
+        properties: { is_banned: { type: 'boolean', example: true } },
+      },
+      AdminVaccineType: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 4 },
+          name: { type: 'string', example: 'Rabies - Dog' },
+          species_id: { type: 'integer', example: 1 },
+          species_name: { type: 'string', example: 'Dog' },
+          interval_days: { type: 'integer', nullable: true, example: 365 },
+          description: { type: 'string', nullable: true },
+          is_active: { type: 'boolean', example: true },
+        },
+      },
+      AdminVaccineTypeInput: {
+        type: 'object',
+        required: ['name', 'species_id'],
+        properties: {
+          name: { type: 'string', maxLength: 150 },
+          species_id: { type: 'integer', minimum: 1 },
+          interval_days: { type: 'integer', minimum: 1, maximum: 3650, nullable: true },
+          description: { type: 'string', maxLength: 5000, nullable: true },
+          is_active: { type: 'boolean', description: 'Only used by PUT' },
         },
       },
       VaccineType: {
