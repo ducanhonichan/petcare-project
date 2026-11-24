@@ -4,11 +4,13 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import StateDisplay from '../components/StateDisplay'
 
 import { API_BASE } from '../api/config'
+import { clearSession } from '../auth/session'
 
 function Dashboard() {
   const navigate = useNavigate()
   const { reminders, retryReminders } = useOutletContext()
   const [summary, setSummary] = useState(null)
+  const [activities, setActivities] = useState([])
   const [error, setError] = useState('')
   const [reload, setReload] = useState(0)
 
@@ -35,26 +37,16 @@ function Dashboard() {
       }
 
       try {
-        const pets = await getData('/pets', 'Unable to load your pets.')
-        if (!Array.isArray(pets)) throw new Error('Invalid pets data.')
-
-        const weightCounts = await Promise.all(pets.map(async (pet) => {
-          const result = await getData(
-            `/pets/${pet.id}/weights`, 'Unable to load weight records.'
-          )
-          if (!Array.isArray(result.data)) throw new Error('Invalid weight records data.')
-          return result.data.length
-        }))
-
+        const result = await getData('/dashboard', 'Unable to load dashboard records.')
+        if (!result.summary || !Array.isArray(result.activities)) throw new Error('Invalid dashboard data.')
         if (!signal.aborted) {
-          setSummary({
-            totalPets: pets.length,
-            totalWeights: weightCounts.reduce((sum, count) => sum + count, 0),
-          })
+          setSummary(result.summary)
+          setActivities(result.activities)
         }
       } catch (error) {
         if (signal.aborted) return
         if (error.status === 401) {
+          clearSession()
           navigate('/login', { replace: true })
         } else {
           setError(error instanceof TypeError
@@ -88,8 +80,8 @@ function Dashboard() {
     },
     {
       title: 'Vet Visits',
-      value: '—',
-      description: 'API integration pending',
+      value: summary?.totalVisits,
+      description: 'Total recorded veterinary visits',
       icon: '🩺',
     },
   ]
@@ -173,13 +165,31 @@ function Dashboard() {
 
       <section className="dashboard-section">
         <h2>Recent Activities</h2>
-        <div className="dashboard-activity">
-          <span>📋</span>
-          <div>
-            <strong>Coming soon</strong>
-            <p>Recent activities will appear after API integration.</p>
-          </div>
-        </div>
+        <p>Latest health records, ordered by record date.</p>
+        {error ? <p role="status">Activities could not be loaded. Use Try again above.</p>
+          : summary === null ? <StateDisplay type="loading" title="Loading activities…" />
+          : activities.length === 0 ? <StateDisplay title="No health records yet" message="Add a weight, veterinary visit or vaccination to see it here." />
+          : <ul className="dashboard-activities">
+            {activities.map((activity) => {
+              const kinds = {
+                weight: { icon: '⚖️', label: 'Weight recorded', path: 'weights' },
+                visit: { icon: '🩺', label: 'Veterinary visit', path: 'visits' },
+                vaccination: { icon: '💉', label: 'Vaccination', path: 'vaccinations' },
+              }
+              const kind = kinds[activity.kind]
+              if (!kind) return null
+              return <li key={activity.kind + '-' + activity.id}>
+                <Link className="dashboard-activity" to={'/pets/' + activity.pet_id + '/' + kind.path}>
+                  <span aria-hidden="true">{kind.icon}</span>
+                  <div>
+                    <strong>{activity.pet_name} · {kind.label}</strong>
+                    <p>{activity.detail}</p>
+                    <time dateTime={activity.record_date}>{activity.record_date}</time>
+                  </div>
+                </Link>
+              </li>
+            })}
+          </ul>}
       </section>
     </div>
   )

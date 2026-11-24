@@ -115,6 +115,42 @@ const openapi = {
     },
   ],
   paths: {
+    '/api/dashboard': {
+      get: {
+        tags: ['Pets'], summary: 'Health overview for the logged-in user', security: auth,
+        description: 'Counts active owned pets, weight records and vet visits. Returns at most eight health records ordered by record date (not an audit log).',
+        responses: {
+          200: jsonResponse('Overview', { type: 'object', properties: {
+            summary: { type: 'object', properties: {
+              totalPets: { type: 'integer' }, totalWeights: { type: 'integer' }, totalVisits: { type: 'integer' },
+            } },
+            activities: { type: 'array', items: { type: 'object', properties: {
+              kind: { type: 'string', enum: ['weight', 'visit', 'vaccination'] }, id: { type: 'integer' },
+              pet_id: { type: 'integer' }, pet_name: { type: 'string' }, detail: { type: 'string' },
+              record_date: { type: 'string', format: 'date' },
+            } } },
+          } }), 401: R401, 500: R500,
+        },
+      },
+    },
+    '/api/pets/{id}/photo': {
+      post: {
+        tags: ['Pets'], summary: 'Upload a pet photo', security: auth,
+        parameters: [idParam('id', 'ID of an active pet owned by the logged-in user')],
+        requestBody: { required: true, content: { 'multipart/form-data': { schema: {
+          type: 'object', required: ['photo'], properties: { photo: { type: 'string', format: 'binary' } },
+        } } } },
+        description: 'JPEG, PNG or WebP, maximum 5 MB. Requires backend Cloudinary configuration. Only updates avatar_url.',
+        responses: {
+          200: jsonResponse('Saved photo', { type: 'object', properties: { avatar_url: { type: 'string', format: 'uri' }, message: { type: 'string' } } }),
+          400: errorResponse('Invalid file or ID', 'Choose a JPEG, PNG or WebP photo.'),
+          401: R401, 404: errorResponse("Missing, deleted or another owner's pet", 'Pet not found'),
+          413: errorResponse('Photo exceeds 5 MB', 'Photo must be 5 MB or smaller.'),
+          500: R500, 502: errorResponse('Storage failed', 'Could not save the photo. Please try again.'),
+          503: errorResponse('Storage not configured', 'Photo uploads are not configured yet. Please try again later.'),
+        },
+      },
+    },
     '/': {
       get: {
         tags: ['System'],

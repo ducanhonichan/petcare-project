@@ -149,7 +149,15 @@ async function softDeletePet(petId, userId) {
 
 
 
+async function updatePetAvatar(petId, userId, avatarUrl) {
+  const [result] = await pool.query(
+    'UPDATE pets SET avatar_url = ? WHERE id = ? AND user_id = ? AND is_active = TRUE',
+    [avatarUrl, petId, userId]
+  );
+  return result.affectedRows > 0;
+}
 module.exports = {
+  updatePetAvatar,
   getPetsByUserId,
   createPet,
   getPetById,
