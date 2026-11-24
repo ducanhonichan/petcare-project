@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const requireAuth = require('../middleware/requireAuth');
+const { todayString } = require('../utils/dates');
 
 const {
   findOwnedPet,
@@ -69,11 +70,11 @@ function validateWeight(req, res, next) {
     weight_kg === undefined ||
     !Number.isFinite(weight) ||
     weight <= 0 ||
-    weight > 9999.99 ||
+    weight > 150 ||
     !/^\d+(\.\d{1,2})?$/.test(String(weight_kg))
   ) {
     return res.status(400).json({
-      message: 'Weight must be a positive number with up to 2 decimal places.',
+      message: 'Weight must be between 0.01 and 150 kg, with up to 2 decimal places.',
     });
   }
 
@@ -83,6 +84,10 @@ function validateWeight(req, res, next) {
     return res.status(400).json({
       message: 'Please provide a valid measurement date and time.',
     });
+  }
+
+  if (normalizedDateTime.slice(0, 10) > todayString()) {
+    return res.status(400).json({ message: 'Measurement date cannot be in the future.' });
   }
 
   if (
@@ -145,6 +150,7 @@ router.get('/:petId/weights', checkPetOwnership, async (req, res, next) => {
     return res.status(200).json({
       message: 'Weight history retrieved successfully.',
       data: weights,
+      today: todayString(),
     });
   } catch (error) {
     next(error);
@@ -173,9 +179,12 @@ router.post(
         data: weight,
       });
     } catch (error) {
+      if (error.code === 'PET_NOT_FOUND') {
+        return res.status(404).json({ message: 'Pet not found.' });
+      }
       if (error.code === 'ER_DUP_ENTRY') {
         return res.status(409).json({
-          message: 'A weight record already exists at this date and time.',
+          message: 'A weight record already exists for this day.',
         });
       }
 
@@ -238,9 +247,12 @@ router.put(
         data: weight,
       });
     } catch (error) {
+      if (error.code === 'PET_NOT_FOUND') {
+        return res.status(404).json({ message: 'Pet not found.' });
+      }
       if (error.code === 'ER_DUP_ENTRY') {
         return res.status(409).json({
-          message: 'A weight record already exists at this date and time.',
+          message: 'A weight record already exists for this day.',
         });
       }
 

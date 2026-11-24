@@ -412,6 +412,7 @@ const openapi = {
             properties: {
               message: { type: 'string' },
               data: { type: 'array', items: ref('WeightLog') },
+              today: { type: 'string', format: 'date', description: 'Server calendar date used to validate measurements' },
             },
           }),
           400: errorResponse('Pet ID is not a positive integer', 'Invalid pet ID.'),
@@ -423,7 +424,7 @@ const openapi = {
         tags: ['Weights'],
         summary: 'Add a weight measurement',
         description:
-          'Only one measurement is allowed per pet at the same date and time.',
+          'Only one measurement is allowed per pet per calendar day, regardless of time. Measurement dates cannot be after the server calendar date.',
         security: auth,
         parameters: [petIdParam],
         requestBody: jsonBody('WeightInput', {
@@ -440,14 +441,14 @@ const openapi = {
             },
           }),
           400: errorResponse(
-            'weight_kg not a positive number with at most 2 decimals, invalid measured_at, or note too long',
-            'Weight must be a positive number with up to 2 decimal places.'
+            'weight_kg outside 0.01 to 150 kg or more than 2 decimals, invalid/future measured_at, or note too long',
+            'Weight must be between 0.01 and 150 kg, with up to 2 decimal places.'
           ),
           401: R401,
           404: notFoundPet,
           409: errorResponse(
-            'There is already a measurement at this date and time',
-            'A weight record already exists at this date and time.'
+            'There is already a measurement for this pet on this day',
+            'A weight record already exists for this day.'
           ),
         },
       },
@@ -456,6 +457,7 @@ const openapi = {
       put: {
         tags: ['Weights'],
         summary: 'Update a weight measurement',
+        description: 'Measurement dates cannot be in the future. Only one measurement per pet per calendar day; editing a record on its own day is allowed.',
         security: auth,
         parameters: [petIdParam, idParam('weightId', 'Weight record ID')],
         requestBody: jsonBody('WeightInput', {
@@ -478,8 +480,8 @@ const openapi = {
             'Weight record not found.'
           ),
           409: errorResponse(
-            'There is already a measurement at this date and time',
-            'A weight record already exists at this date and time.'
+            'There is already a measurement for this pet on this day',
+            'A weight record already exists for this day.'
           ),
         },
       },
@@ -1004,8 +1006,8 @@ const openapi = {
           },
           measured_at: {
             type: 'string',
-            format: 'date-time',
-            example: '2026-10-01T09:00:00.000Z',
+            description: 'Calendar date and time without timezone conversion: YYYY-MM-DD HH:mm:ss',
+            example: '2026-10-01 09:00:00',
           },
           note: { type: 'string', nullable: true },
         },
@@ -1016,12 +1018,13 @@ const openapi = {
         properties: {
           weight_kg: {
             type: 'number',
-            description: 'Greater than 0, at most 9999.99, up to 2 decimals',
+            description: 'From 0.01 to 150 kg, up to 2 decimals',
+            minimum: 0.01, maximum: 150,
             example: 4.7,
           },
           measured_at: {
             type: 'string',
-            description: '`YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted.',
+            description: '`YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted. The calendar day cannot be after the server date returned as today in weight history.',
             example: '2026-10-01 09:00',
           },
           note: { type: 'string', maxLength: 5000, nullable: true },

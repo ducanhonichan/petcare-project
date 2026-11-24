@@ -6,6 +6,12 @@ import WeightChart from '../components/WeightChart'
 
 import { API_BASE } from '../api/config'
 
+function localToday() {
+  const now = new Date()
+  const pad = value => String(value).padStart(2, '0')
+  return now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+}
+
 const emptyForm = {
   weight_kg: '',
   measured_at: '',
@@ -104,7 +110,7 @@ function PetWeights({ petId }) {
         if (!Array.isArray(result.data)) {
           throw new Error('The server returned an invalid weight history.')
         }
-        if (!controller.signal.aborted) setHistory({ records: result.data })
+        if (!controller.signal.aborted) setHistory({ records: result.data, today: result.today })
       } catch (error) {
         if (!controller.signal.aborted) {
           setHistory({
@@ -148,13 +154,22 @@ function PetWeights({ petId }) {
       !/^\d+(\.\d{1,2})?$/.test(rawWeight) ||
       !Number.isFinite(weight) ||
       weight <= 0 ||
-      weight > 9999.99
+      weight > 150
     ) {
-      return 'Please enter a valid weight (0.01–9999.99 kg, up to 2 decimals).'
+      return 'Please enter a valid weight (0.01–150 kg, up to 2 decimals).'
     }
 
     if (!form.measured_at) {
       return 'Please select the measurement date and time.'
+    }
+
+    const day = form.measured_at.slice(0, 10)
+    if (day > (history?.today || localToday())) {
+      return 'Measurement date cannot be in the future.'
+    }
+    if (records.some(record => String(record.id) !== String(editingId) &&
+        toInputDateTime(record.measured_at).slice(0, 10) === day)) {
+      return 'A weight record already exists for this day.'
     }
 
     if (form.note.length > 5000) {
@@ -284,7 +299,7 @@ function PetWeights({ petId }) {
               name="weight_kg"
               type="number"
               min="0.01"
-              max="9999.99"
+              max="150"
               step="0.01"
               value={form.weight_kg}
               onChange={handleChange}
@@ -302,6 +317,7 @@ function PetWeights({ petId }) {
               id="measured-at"
               name="measured_at"
               type="datetime-local"
+              max={(history?.today || localToday()) + 'T23:59'}
               step="60"
               value={form.measured_at}
               onChange={handleChange}
