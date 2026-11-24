@@ -12,7 +12,7 @@ information is available online and can be tried live in **Swagger UI**.
 
 ## 1. Conventions
 
-- Requests and responses are JSON. Dates are `YYYY-MM-DD` unless stated otherwise.
+- Requests and responses are JSON, except photo uploads which use multipart/form-data. Dates are `YYYY-MM-DD` unless stated otherwise.
 - **Authentication:** log in with `POST /api/auth/login`, then send `Authorization: Bearer <token>` on every protected endpoint. The token (JWT, payload `{ id, role }`) is valid for 7 days.
 - **Roles:** `USER` and `ADMIN`. Endpoints under `/api/admin` need role `ADMIN`. Banned accounts cannot log in and their tokens stop working.
 - **Error format:** every error is `{ "message": "..." }`.
@@ -27,6 +27,7 @@ information is available online and can be tried live in **Swagger UI**.
 | Rule | Description |
 |---|---|
 | R1 | Every pet belongs to exactly one owner; all queries filter by the logged-in user. |
+| R2 | Weight is 0.01–150 kg with up to two decimals; no future calendar days; at most one record per pet/day. Editing a record on its own day is allowed. |
 | R3 | `next_due_date` = `given_date` + the vaccine type's `interval_days` when it is not sent. A manual `next_due_date` must not be before `given_date`; `given_date` cannot be in the future. |
 | R4 | Reminder status is computed on the server: **OVERDUE** (`next_due_date` before today), **DUE_SOON** (within the user's `remind_before_days`, default 7), **LATER** (everything else). |
 | R5 | Only the latest dose of each (pet, vaccine type) pair is used for reminders. |
@@ -130,9 +131,9 @@ Creates a user with role `USER` and signs the user in (returns a token).
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `name` | string | yes |  |
-| `email` | string (email) | yes |  |
-| `password` | string | yes | min 8 chars |
+| `name` | string | yes | 1–100 chars after trimming |
+| `email` | string (email) | yes | max 255 chars; trimmed and lowercased |
+| `password` | string | yes | min 8 chars; max 72 UTF-8 bytes |
 
 ```json
 {
@@ -147,7 +148,7 @@ Creates a user with role `USER` and signs the user in (returns a token).
 | Status | Meaning | Message / example |
 |---|---|---|
 | 201 | Account created |  |
-| 400 | Missing name, invalid email, or password shorter than 8 characters | `Password must be at least 8 characters` |
+| 400 | Invalid name (1–100 chars), email (max 255 chars), or password (min 8 chars, max 72 UTF-8 bytes) | `Password must be at least 8 characters` |
 | 409 | Email already registered | `Email already in use` |
 | 500 | Unexpected server error | `Internal server error` |
 
@@ -579,7 +580,7 @@ Weight history of a pet.
 
 **Weight history of a pet** · Auth: Bearer token
 
-Newest measurement first.
+Newest measurement first. Each record contains `id`, `pet_id`, decimal-string `weight_kg`, `measured_at` as `YYYY-MM-DD HH:mm:ss` without timezone conversion, and nullable `note`. The response also includes `today` (server calendar date, `YYYY-MM-DD`).
 
 **Parameters**
 
@@ -608,7 +609,7 @@ Response fields (200):
 
 **Add a weight measurement** · Auth: Bearer token
 
-Only one measurement is allowed per pet at the same date and time.
+Only one measurement is allowed per pet per calendar day, regardless of time. Measurement dates cannot be after the server calendar date.
 
 **Parameters**
 
@@ -620,8 +621,8 @@ Only one measurement is allowed per pet at the same date and time.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `weight_kg` | number | yes | Greater than 0, at most 9999.99, up to 2 decimals |
-| `measured_at` | string | yes | `YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted. |
+| `weight_kg` | number | yes | From 0.01 to 150 kg inclusive, up to 2 decimals |
+| `measured_at` | string | yes | `YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted. The calendar day cannot be after `today` returned by weight history. |
 | `note` | string, nullable | no | max 5000 chars |
 
 ```json
@@ -637,10 +638,10 @@ Only one measurement is allowed per pet at the same date and time.
 | Status | Meaning | Message / example |
 |---|---|---|
 | 201 | Measurement saved |  |
-| 400 | weight_kg not a positive number with at most 2 decimals, invalid measured_at, or note too long | `Weight must be a positive number with up to 2 decimal places.` |
+| 400 | weight_kg outside 0.01–150 kg or more than 2 decimals, invalid/future measured_at, or note too long | `Weight must be between 0.01 and 150 kg, with up to 2 decimal places.` |
 | 401 | Missing, invalid or expired token | `Authentication required` |
 | 404 | Pet does not exist, is deleted, or belongs to another user (all answer 404 so other people's data is never revealed) | `Pet not found` |
-| 409 | There is already a measurement at this date and time | `A weight record already exists at this date and time.` |
+| 409 | There is already a measurement for this pet on this day | `A weight record already exists for this day.` |
 
 Response fields (201):
 
@@ -654,6 +655,8 @@ Response fields (201):
 
 **Update a weight measurement** · Auth: Bearer token
 
+The same weight and date rules as create apply. Editing the current record on its own day is allowed; moving it into another occupied day returns 409.
+
 **Parameters**
 
 | Name | In | Required | Notes |
@@ -665,8 +668,8 @@ Response fields (201):
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `weight_kg` | number | yes | Greater than 0, at most 9999.99, up to 2 decimals |
-| `measured_at` | string | yes | `YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted. |
+| `weight_kg` | number | yes | From 0.01 to 150 kg inclusive, up to 2 decimals |
+| `measured_at` | string | yes | `YYYY-MM-DD HH:mm` (seconds optional). A `T` instead of the space is accepted. The calendar day cannot be after `today` returned by weight history. |
 | `note` | string, nullable | no | max 5000 chars |
 
 ```json
@@ -685,7 +688,7 @@ Response fields (201):
 | 400 | Invalid ID or invalid body | `Invalid weight record ID.` |
 | 401 | Missing, invalid or expired token | `Authentication required` |
 | 404 | Pet or weight record not found | `Weight record not found.` |
-| 409 | There is already a measurement at this date and time | `A weight record already exists at this date and time.` |
+| 409 | There is already a measurement for this pet on this day | `A weight record already exists for this day.` |
 
 Response fields (200):
 
