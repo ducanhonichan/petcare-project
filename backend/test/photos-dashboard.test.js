@@ -6,6 +6,9 @@ const queries = [];
 const poolPath = require.resolve('../src/config/db');
 require.cache[poolPath] = { id: poolPath, filename: poolPath, loaded: true, exports: {
   query: async (sql, params) => {
+    if (sql.startsWith('SELECT id, role, is_banned FROM users')) {
+      return [[{ id: params[0], role: 'USER', is_banned: 0 }]];
+    }
     queries.push({ sql, params });
     if (sql.startsWith('UPDATE')) return [{ affectedRows: 1 }];
     if (sql.includes('totalPets')) return [[{ totalPets: '2', totalWeights: '3', totalVisits: '4' }]];

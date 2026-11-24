@@ -27,17 +27,26 @@ router.post('/register', async (req, res) => {
     const email = str(body.email).trim().toLowerCase();
     const password = str(body.password);
 
-    if (!name) {
-      return res.status(400).json({ message: 'Name is required' });
+    if (!name || name.length > 100) {
+      return res.status(400).json({
+        message: 'Name must be 1 to 100 characters',
+      });
     }
 
-    if (!EMAIL_REGEX.test(email)) {
+    if (!EMAIL_REGEX.test(email) || email.length > 255) {
       return res.status(400).json({ message: 'Invalid email' });
     }
 
     if (password.length < 8) {
       return res.status(400).json({
         message: 'Password must be at least 8 characters',
+      });
+    }
+
+    // bcrypt chi doc 72 byte dau, nen gioi han de tranh hieu nham
+    if (Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({
+        message: 'Password must be at most 72 bytes',
       });
     }
 

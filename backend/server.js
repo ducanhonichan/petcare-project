@@ -61,10 +61,25 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Xử lý lỗi chung
+// Route khong ton tai -> JSON thay vi trang HTML mac dinh cua Express
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Xu ly loi chung: moi loi deu tra ve dang { message }
 app.use((err, req, res, next) => {
+  // Body JSON bi sai cu phap
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ message: 'Invalid JSON body' });
+  }
+
+  // Body qua lon
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Request body too large' });
+  }
+
   console.error(err);
-  res.status(500).json({ message: 'Server error' });
+  res.status(500).json({ message: 'Internal server error' });
 });
 
 const PORT = process.env.PORT || 3000;
