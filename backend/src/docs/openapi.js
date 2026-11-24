@@ -196,7 +196,7 @@ const openapi = {
         responses: {
           201: jsonResponse('Account created', ref('AuthResponse')),
           400: errorResponse(
-            'Missing name, invalid email, or password shorter than 8 characters',
+            'Invalid name (1–100 chars), email (max 255 chars), or password (min 8 chars, max 72 UTF-8 bytes)',
             'Password must be at least 8 characters'
           ),
           409: errorResponse('Email already registered', 'Email already in use'),
@@ -886,9 +886,9 @@ const openapi = {
         type: 'object',
         required: ['name', 'email', 'password'],
         properties: {
-          name: { type: 'string', example: 'Bao Phan' },
-          email: { type: 'string', format: 'email', example: 'bao@example.com' },
-          password: { type: 'string', minLength: 8 },
+          name: { type: 'string', minLength: 1, maxLength: 100, example: 'Bao Phan' },
+          email: { type: 'string', format: 'email', maxLength: 255, example: 'bao@example.com' },
+          password: { type: 'string', minLength: 8, description: 'Maximum 72 UTF-8 bytes' },
         },
       },
       LoginRequest: {
